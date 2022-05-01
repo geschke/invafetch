@@ -8,9 +8,13 @@ import (
 	"os/signal"
 	"runtime"
 	"time"
+
+	"github.com/geschke/golrackpi"
 )
 
 type CollectDaemon struct {
+	AuthData golrackpi.AuthClient
+	lib      *golrackpi.AuthClient
 }
 
 func (cd *CollectDaemon) genNewId(id int) int {
@@ -21,13 +25,19 @@ func (cd *CollectDaemon) genNewId(id int) int {
 func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 	log.Println("in innerLoop mit i ", i)
 
-	timer2 := time.NewTimer(10000 * time.Millisecond)
-	ticker := time.NewTicker(950 * time.Millisecond)
+	timer2 := time.NewTimer(30 * time.Second)
+	ticker := time.NewTicker(3 * time.Second)
 
 	for active := true; active; {
 		select {
 		case t := <-ticker.C:
 			fmt.Println("Tick at", t)
+			pd, err := cd.lib.ProcessDataModule("devices:local")
+			if err != nil {
+				fmt.Println(err)
+				panic("hard error")
+			}
+			fmt.Println(pd)
 
 		case <-timer2.C:
 			log.Println("timer2 fired")
@@ -65,6 +75,11 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 			default:
 				cd.PrintMemUsage()
 				log.Println("in for mit id ", id, " und cnt:", cnt, " and before innerLoop", time.Now())
+				err := cd.logoutLogin()
+				if err != nil {
+					fmt.Println(err)
+					panic("hard error 2") // todo error handling
+				}
 				id = cd.innerLoop(ctx, id)
 				log.Println("after innerLoop id", id, time.Now())
 				id = cd.genNewId(id)
@@ -97,7 +112,56 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 	return
 }
 
+func (cd *CollectDaemon) logoutLogin() error {
+	ok, err := cd.lib.Logout()
+	if err != nil {
+		//fmt.Println("logout error", err)
+		return fmt.Errorf("logout error: %s", err)
+	}
+	fmt.Println("logout ok?", ok)
+
+	fmt.Println("Try another login...")
+	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
+
+	fmt.Println(cd.lib.SessionId)
+
+	sessionId, err := cd.lib.Login()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return fmt.Errorf("login error: %s", err)
+	}
+	fmt.Println("SessionId", sessionId)
+
+	return nil
+}
+
 func (cd *CollectDaemon) Start() {
+
+	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
+
+	fmt.Println(cd.lib.SessionId)
+
+	sessionId, err := cd.lib.Login()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return
+	}
+	fmt.Println("SessionId", sessionId)
+
+	/*	err = cd.logoutLogin()
+		if err != nil {
+			fmt.Println("Error when connecting again", err)
+			return
+		}
+
+		ok, err := cd.lib.Logout()
+		if err != nil {
+			fmt.Println("logout error", err)
+			return
+		}
+		fmt.Println("logout ok?", ok)
+
+		return*/
 
 	cd.PrintMemUsage()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -123,6 +187,7 @@ func (cd *CollectDaemon) Start() {
 	log.Println("after outerLoop")
 
 	cd.PrintMemUsage()
+
 }
 
 // https://golangcode.com/print-the-current-memory-usage/

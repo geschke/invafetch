@@ -5,7 +5,9 @@
 package cmd
 
 import (
+	"github.com/geschke/golrackpi"
 	"github.com/geschke/invafetch/internal"
+
 	"github.com/spf13/cobra"
 )
 
@@ -52,6 +54,13 @@ func startCollect() {
 			fmt.Printf("%s: %v\n", k, v)
 		}
 	*/
-	daemon := internal.CollectDaemon{}
+
+	authData := golrackpi.AuthClient{
+		Scheme:   authData.Scheme,
+		Server:   authData.Server,
+		Password: authData.Password,
+	}
+
+	daemon := internal.CollectDaemon{AuthData: authData}
 	daemon.Start()
 }
