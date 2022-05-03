@@ -10,13 +10,26 @@ import (
 
 	"github.com/geschke/golrackpi"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var rootCmd = &cobra.Command{
-	Use:   "invafetch",
-	Short: "A tool for retrieving values from Kostal Plenticore inverters",
-	//Long: ` `,
-}
+var (
+	// Used for flags.
+	cfgFile    string
+	dbHost     string
+	dbName     string
+	dbUser     string
+	dbPassword string
+	dbPort     string
+
+	rootCmd = &cobra.Command{
+		Use:   "invafetch",
+		Short: "A tool for retrieving values from Kostal Plenticore inverters",
+		//Long: ` `,
+	}
+)
+
+var author string
 
 var authData golrackpi.AuthClient
 
@@ -28,13 +41,78 @@ var (
 	outputNoHeaders bool   = false
 )
 
+/*// LoadConfig uses the viper library to load and extract database configuration from .env file or environment variables
+func initConfig(path string) (config dbconn.DatabaseConfigurations, err error) {
+	viper.AddConfigPath(path)
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+
+	viper.AutomaticEnv()
+
+	err = viper.ReadInConfig()
+	if err != nil {
+		return
+	}
+
+	err = viper.Unmarshal(&config)
+	return
+}*/
+
 // init sets the global flags and their options.
 func init() {
+	cobra.OnInitialize(initConfig)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ~/.env)")
+
+	// todo: make authData variables usable by environment
 	rootCmd.PersistentFlags().StringVarP(&authData.Password, "password", "p", "", "Password (required)")
 	rootCmd.PersistentFlags().StringVarP(&authData.Server, "server", "s", "", "Server (e.g. inverter IP address) (required)")
 	rootCmd.PersistentFlags().StringVarP(&authData.Scheme, "scheme", "m", "", "Scheme (http or https, default http)")
 	rootCmd.MarkPersistentFlagRequired("password")
 	rootCmd.MarkPersistentFlagRequired("server")
+
+	rootCmd.PersistentFlags().StringVarP(&dbName, "dbname", "", "", "Database name")
+	viper.BindPFlag("dbName", rootCmd.PersistentFlags().Lookup("dbname"))
+
+	rootCmd.PersistentFlags().StringVarP(&dbHost, "dbhost", "", "", "Database host")
+	viper.BindPFlag("dbHost", rootCmd.PersistentFlags().Lookup("dbhost"))
+
+	rootCmd.PersistentFlags().StringVarP(&dbUser, "dbuser", "", "", "Database user")
+	viper.BindPFlag("dbUser", rootCmd.PersistentFlags().Lookup("dbuser"))
+
+	rootCmd.PersistentFlags().StringVarP(&dbPassword, "dbpassword", "", "", "Database password")
+	viper.BindPFlag("dbPassword", rootCmd.PersistentFlags().Lookup("dbpassword"))
+
+	rootCmd.PersistentFlags().StringVarP(&dbPort, "dbport", "", "", "Database port (default: 3306)")
+	viper.BindPFlag("dbPort", rootCmd.PersistentFlags().Lookup("dbport"))
+
+	viper.SetDefault("dbPort", "3306")
+	//viper.SetDefault("dbuser", "solardbuser")
+
+}
+
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+
+		// Find home directory.
+		//home, err := os.UserHomeDir()
+		//cobra.CheckErr(err)
+
+		// Search config in home directory with name ".cobra" (without extension).
+		viper.AddConfigPath(".")
+
+		viper.SetConfigName(".env")
+		viper.SetConfigType("env")
+	}
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+
+	}
 
 }
 

@@ -2,6 +2,7 @@ package internal
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -10,11 +11,25 @@ import (
 	"time"
 
 	"github.com/geschke/golrackpi"
+	"github.com/geschke/invafetch/internal/dbconn"
+	"github.com/geschke/invafetch/internal/invdb"
+	"github.com/spf13/viper"
 )
+
+var repository *invdb.Repository
 
 type CollectDaemon struct {
 	AuthData golrackpi.AuthClient
 	lib      *golrackpi.AuthClient
+}
+
+func convertStuff(pd []golrackpi.ProcessDataValues) {
+
+	foo, _ := json.Marshal(pd)
+	// todo: error handling
+	fmt.Println(string(foo))
+	repository.AddData(string(foo))
+	//panic("die hard")
 }
 
 func (cd *CollectDaemon) genNewId(id int) int {
@@ -38,6 +53,7 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 				panic("hard error")
 			}
 			fmt.Println(pd)
+			convertStuff(pd)
 
 		case <-timer2.C:
 			log.Println("timer2 fired")
@@ -135,9 +151,29 @@ func (cd *CollectDaemon) logoutLogin() error {
 	return nil
 }
 
+func GetDbConfig() dbconn.DatabaseConfiguration {
+	// could something go wrong here?
+	fmt.Println(viper.Get("dbName"))
+	fmt.Println(viper.Get("dbHost"))
+	fmt.Println(viper.Get("dbUser"))
+	fmt.Println(viper.Get("dbPassword"))
+	fmt.Println(viper.Get("dbPort"))
+	var config dbconn.DatabaseConfiguration
+	config.DBHost = viper.GetString("dbHost")
+	config.DBName = viper.GetString("dbName")
+	config.DBPassword = viper.GetString("dbPassword")
+	config.DBUser = viper.GetString("dbUser")
+	config.DBPort = viper.GetString("dbPort")
+	return config
+}
+
 func (cd *CollectDaemon) Start() {
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
+
+	config := dbconn.ConnectDB(GetDbConfig())
+
+	repository = invdb.NewRepository(config)
 
 	fmt.Println(cd.lib.SessionId)
 
