@@ -5,9 +5,12 @@
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
+
 	"github.com/geschke/golrackpi"
 	"github.com/geschke/invafetch/internal"
-
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +30,26 @@ var startCmd = &cobra.Command{
 		args []string) {
 		startCollect()
 	},
+}
+
+func readProcessdataConfig() ([]golrackpi.ProcessData, error) {
+	filename := "processdata.json"
+	// todo: get filename from config variable, error handling and more
+	f, err := os.ReadFile(filename)
+	if err != nil {
+		panic("file problem")
+		// todo: error handling
+	}
+	fmt.Println(json.Valid(f))
+
+	var processData []golrackpi.ProcessData
+	err = json.Unmarshal(f, &processData)
+	if err != nil {
+		panic("json file error") // todo....
+
+	}
+	fmt.Println(processData)
+	return processData, nil
 }
 
 func startCollect() {
@@ -55,6 +78,11 @@ func startCollect() {
 		}
 	*/
 
+	collectData, err := readProcessdataConfig()
+	if err != nil {
+		panic("problem!!!")
+	}
+
 	authData := golrackpi.AuthClient{
 		Scheme:   authData.Scheme,
 		Server:   authData.Server,
@@ -62,5 +90,5 @@ func startCollect() {
 	}
 
 	daemon := internal.CollectDaemon{AuthData: authData}
-	daemon.Start()
+	daemon.Start(collectData)
 }

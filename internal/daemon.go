@@ -17,6 +17,7 @@ import (
 )
 
 var repository *invdb.Repository
+var collectProcessData []golrackpi.ProcessData
 
 type CollectDaemon struct {
 	AuthData golrackpi.AuthClient
@@ -47,7 +48,8 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 		select {
 		case t := <-ticker.C:
 			fmt.Println("Tick at", t)
-			pd, err := cd.lib.ProcessDataModule("devices:local")
+			//pd, err := cd.lib.ProcessDataModule("devices:local")
+			pd, err := cd.lib.ProcessDataValues(collectProcessData)
 			if err != nil {
 				fmt.Println(err)
 				panic("hard error")
@@ -167,13 +169,15 @@ func GetDbConfig() dbconn.DatabaseConfiguration {
 	return config
 }
 
-func (cd *CollectDaemon) Start() {
+func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
 
 	config := dbconn.ConnectDB(GetDbConfig())
 
 	repository = invdb.NewRepository(config)
+
+	collectProcessData = configProcessData
 
 	fmt.Println(cd.lib.SessionId)
 
