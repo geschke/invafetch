@@ -1,4 +1,4 @@
-package internal
+package pkg
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/geschke/golrackpi"
-	"github.com/geschke/invafetch/internal/dbconn"
-	"github.com/geschke/invafetch/internal/invdb"
+	"github.com/geschke/invafetch/pkg/dbconn"
+	"github.com/geschke/invafetch/pkg/invdb"
 	"github.com/spf13/viper"
 )
 

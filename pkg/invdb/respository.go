@@ -31,7 +31,7 @@ func (r *Repository) GetProcessdata() []ProcessdataEntry {
 
 	//db := dbconn.ConnectDB(dsn)
 	var items []ProcessdataEntry
-	results, err := r.db.Query("SELECT * from solardata")
+	results, err := r.db.Query("SELECT * from solardata LIMIT 0,1")
 
 	if err != nil {
 		log.Println("Database problem in GetShares: " + err.Error())

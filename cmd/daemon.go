@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/geschke/golrackpi"
-	"github.com/geschke/invafetch/internal"
+	"github.com/geschke/invafetch/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -89,6 +89,6 @@ func startCollect() {
 		Password: authData.Password,
 	}
 
-	daemon := internal.CollectDaemon{AuthData: authData}
+	daemon := pkg.CollectDaemon{AuthData: authData}
 	daemon.Start(collectData)
 }
