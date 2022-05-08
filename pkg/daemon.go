@@ -24,7 +24,7 @@ type CollectDaemon struct {
 	lib      *golrackpi.AuthClient
 }
 
-type JsonProcessdataValues []golrackpi.ProcessDataValues
+/*type JsonProcessdataValues []golrackpi.ProcessDataValues
 
 func (pdv JsonProcessdataValues) MarshalJSON() ([]byte, error) {
 	type localPdv JsonProcessdataValues
@@ -44,15 +44,39 @@ func (pdv JsonProcessdataValues) MarshalJSON() ([]byte, error) {
 		},
 	})
 }
+*/
+
+type PdvMap map[string]golrackpi.ProcessDataValue
+
+//func convertPdvMap(pdv []ProcessDataValueJSON) PdvMap {
+func convertPdvMap(pdv []golrackpi.ProcessDataValue) PdvMap {
+	pdvmap := make(PdvMap)
+
+	for i := range pdv {
+		fmt.Println(pdv[i].Id)
+		pdvmap[pdv[i].Id] = pdv[i]
+	}
+	return pdvmap
+}
+
+func convertPdvsMap(pdvs []golrackpi.ProcessDataValues) map[string]PdvMap {
+	pdvsmap := make(map[string]PdvMap)
+	for i := range pdvs {
+		fmt.Println(pdvs[i].ModuleId)
+		pdvsmap[pdvs[i].ModuleId] = convertPdvMap(pdvs[i].ProcessData)
+	}
+	return pdvsmap
+}
 
 func convertStuff(pd []golrackpi.ProcessDataValues) {
 
-	jpd := JsonProcessdataValues(pd)
-	foo, _ := json.Marshal(jpd)
+	//jpd := JsonProcessdataValues(pd)
+	pdvsmap := convertPdvsMap(pd)
+	foo, _ := json.Marshal(pdvsmap)
 	// todo: error handling
 	fmt.Println(string(foo))
-	//repository.AddData(string(foo))
-	panic("die hard")
+	repository.AddData(string(foo))
+	//panic("die hard")
 }
 
 func (cd *CollectDaemon) genNewId(id int) int {
@@ -194,27 +218,6 @@ func GetDbConfig() dbconn.DatabaseConfiguration {
 type ProcessDataValueJSON golrackpi.ProcessDataValue
 
 //type PdvMap map[string]ProcessDataValueJSON
-type PdvMap map[string]golrackpi.ProcessDataValue
-
-//func convertPdvMap(pdv []ProcessDataValueJSON) PdvMap {
-func convertPdvMap(pdv []golrackpi.ProcessDataValue) PdvMap {
-	pdvmap := make(PdvMap)
-
-	for i := range pdv {
-		fmt.Println(pdv[i].Id)
-		pdvmap[pdv[i].Id] = pdv[i]
-	}
-	return pdvmap
-}
-
-func convertPdvsMap(pdvs []golrackpi.ProcessDataValues) map[string]PdvMap {
-	pdvsmap := make(map[string]PdvMap)
-	for i := range pdvs {
-		fmt.Println(pdvs[i].ModuleId)
-		pdvsmap[pdvs[i].ModuleId] = convertPdvMap(pdvs[i].ProcessData)
-	}
-	return pdvsmap
-}
 
 func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
 	type localPdv ProcessDataValueJSON
@@ -237,88 +240,89 @@ func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
 }
 
 func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
-
-	pdv := golrackpi.ProcessDataValue{
-		Unit:  "",
-		Id:    "Statistic:CO2Saving:Day",
-		Value: 16672.1581222652,
-	}
-
-	pdv2 := golrackpi.ProcessDataValue{
-		Unit:  "",
-		Id:    "Statistic:Foo",
-		Value: 10,
-	}
-
-	pdv3 := golrackpi.ProcessDataValue{
-		Unit:  "",
-		Id:    "Statistic:CO2Saving:Day",
-		Value: 16672.1581222652,
-	}
-
-	pdv4 := golrackpi.ProcessDataValue{
-		Unit:  "",
-		Id:    "Statistic:Bar",
-		Value: 20000,
-	}
-
-	//pdvj := ProcessDataValueJSON(pdv)
-	//pdvj2 := ProcessDataValueJSON(pdv2)
-
-	var pdvarr []golrackpi.ProcessDataValue
-	var pdvarr2 []golrackpi.ProcessDataValue
-	//pdvarr = append(pdvarr, pdvj, pdvj2)
-	pdvarr = append(pdvarr, pdv, pdv2)
-	pdvarr2 = append(pdvarr2, pdv2, pdv3, pdv4)
-
-	var pdvsarr []golrackpi.ProcessDataValues
-
-	pdvs := golrackpi.ProcessDataValues{
-		ModuleId:    "scb:statistic:EnergyFlow",
-		ProcessData: pdvarr,
-	}
-
-	pdvs2 := golrackpi.ProcessDataValues{
-		ModuleId:    "scb:statistic:Nothing",
-		ProcessData: pdvarr2,
-	}
-
-	pdvsarr = append(pdvsarr, pdvs, pdvs2)
-
-	result := convertPdvsMap(pdvsarr)
-
-	//result := convertPdvMap(pdvarr)
-
-	//fmt.Println(pdv)
-	//fmt.Println(pdv2)
-	//fmt.Println(pdvarr)
-
-	fmt.Println("after convert", result)
-	jsonPdv, err := json.Marshal(result)
-	if err != nil {
-		fmt.Println("json convert error")
-	}
-	jsonOut := string(jsonPdv)
-	fmt.Println(jsonOut)
-	return
 	/*
-		cd.lib = golrackpi.NewWithParameter(cd.AuthData)
-
-		config := dbconn.ConnectDB(GetDbConfig())
-
-		repository = invdb.NewRepository(config)
-
-		collectProcessData = configProcessData
-
-		fmt.Println(cd.lib.SessionId)
-
-		sessionId, err := cd.lib.Login()
-		if err != nil {
-			fmt.Println("An error occurred:", err)
-			return
+		pdv := golrackpi.ProcessDataValue{
+			Unit:  "",
+			Id:    "Statistic:CO2Saving:Day",
+			Value: 16672.1581222652,
 		}
-		fmt.Println("SessionId", sessionId)
+
+		pdv2 := golrackpi.ProcessDataValue{
+			Unit:  "",
+			Id:    "Statistic:Foo",
+			Value: 10,
+		}
+
+		pdv3 := golrackpi.ProcessDataValue{
+			Unit:  "",
+			Id:    "Statistic:CO2Saving:Day",
+			Value: 16672.1581222652,
+		}
+
+		pdv4 := golrackpi.ProcessDataValue{
+			Unit:  "",
+			Id:    "Statistic:Bar",
+			Value: 20000,
+		}
+
+		//pdvj := ProcessDataValueJSON(pdv)
+		//pdvj2 := ProcessDataValueJSON(pdv2)
+
+		var pdvarr []golrackpi.ProcessDataValue
+		var pdvarr2 []golrackpi.ProcessDataValue
+		//pdvarr = append(pdvarr, pdvj, pdvj2)
+		pdvarr = append(pdvarr, pdv, pdv2)
+		pdvarr2 = append(pdvarr2, pdv2, pdv3, pdv4)
+
+		var pdvsarr []golrackpi.ProcessDataValues
+
+		pdvs := golrackpi.ProcessDataValues{
+			ModuleId:    "scb:statistic:EnergyFlow",
+			ProcessData: pdvarr,
+		}
+
+		pdvs2 := golrackpi.ProcessDataValues{
+			ModuleId:    "scb:statistic:Nothing",
+			ProcessData: pdvarr2,
+		}
+
+		pdvsarr = append(pdvsarr, pdvs, pdvs2)
+
+		result := convertPdvsMap(pdvsarr)
+
+		//result := convertPdvMap(pdvarr)
+
+		//fmt.Println(pdv)
+		//fmt.Println(pdv2)
+		//fmt.Println(pdvarr)
+
+		fmt.Println("after convert", result)
+		jsonPdv, err := json.Marshal(result)
+		if err != nil {
+			fmt.Println("json convert error")
+		}
+		jsonOut := string(jsonPdv)
+		fmt.Println(jsonOut)
+		return
 	*/
+
+	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
+
+	config := dbconn.ConnectDB(GetDbConfig())
+
+	repository = invdb.NewRepository(config)
+
+	collectProcessData = configProcessData
+
+	fmt.Println(cd.lib.SessionId)
+
+	sessionId, err := cd.lib.Login()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return
+	}
+	fmt.Println("SessionId", sessionId)
+
 	/*	err = cd.logoutLogin()
 		if err != nil {
 			fmt.Println("Error when connecting again", err)
