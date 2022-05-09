@@ -15,6 +15,16 @@ type ProcessdataEntry struct {
 	ProcessData string
 }
 
+type HomeConsumption struct {
+	ID          int64
+	DateCreated string
+	HomeOwnP    string
+	HomePvP     string
+	HomeP       string
+	HomeGridP   string
+	HomeBatP    string
+}
+
 type Repository struct {
 	db *sql.DB
 }
@@ -26,15 +36,17 @@ func NewRepository(db *sql.DB) *Repository {
 	}
 }
 
-// GetShares makes something special
-func (r *Repository) GetProcessdata() []ProcessdataEntry {
+// GetHomeConsumption loads home consumption values from database as average of the last 1 minute
+func (r *Repository) GetHomeConsumption() HomeConsumption {
 
 	//db := dbconn.ConnectDB(dsn)
-	var items []ProcessdataEntry
-	results, err := r.db.Query("SELECT * from solardata LIMIT 0,1")
+	var values HomeConsumption
+	//results, err := r.db.Query("SELECT * from solardata LIMIT 0,1")
+
+	results, err := r.db.Query("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local.HomeOwn_P.value')) AS home_own_p, avg(JSON_VALUE(processdata,'$.devices:local.HomePv_P.value')) AS home_pv_p, avg(JSON_VALUE(processdata,'$.devices:local.Home_P.value')) AS home_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeGrid_P.value')) AS home_grid_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeBat_P.value')) AS home_bat_p FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 1 Minute")
 
 	if err != nil {
-		log.Println("Database problem in GetShares: " + err.Error())
+		log.Println("Database problem in GetProcessdata: " + err.Error())
 		os.Exit(1)
 		//panic(err.Error()) // proper error handling instead of panic in your app
 	}
@@ -44,26 +56,26 @@ func (r *Repository) GetProcessdata() []ProcessdataEntry {
 	log.Println("items in database:")
 	//fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", "Host", "Created", "Updated")
 	var id int64
-
-	var dt_created, processdata string
+	var dt_created string
+	var home_own_p, home_pv_p, home_p, home_grid_p, home_bat_p string
 
 	for results.Next() {
 
 		// for each row, scan the result into our tag composite object
-		err = results.Scan(&id, &dt_created, &processdata)
+		err = results.Scan(&id, &dt_created, &home_own_p, &home_pv_p, &home_p, &home_grid_p, &home_bat_p)
 		if err != nil {
 			log.Println(err.Error()) // proper error handling instead of panic in your app
 			os.Exit(1)
 		}
 		// and then print out the tag's Name attribute
 		//fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", host+"."+domainname, dtCreated, dtUpdated)
-		log.Printf("%d %s %s\n", id, dt_created, processdata)
+		log.Printf("%d %s %s %s %s %s %s\n", id, dt_created, home_own_p, home_pv_p, home_p, home_grid_p, home_bat_p)
 		log.Println("Request: ")
 
-		items = append(items, ProcessdataEntry{ID: id, DateCreated: dt_created, ProcessData: processdata})
+		values = HomeConsumption{ID: id, DateCreated: dt_created, HomeOwnP: home_own_p, HomePvP: home_pv_p, HomeP: home_p, HomeGridP: home_grid_p, HomeBatP: home_bat_p}
 
 	}
-	return items
+	return values
 
 }
 
