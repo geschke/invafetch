@@ -9,7 +9,6 @@ import (
 
 	"github.com/geschke/golrackpi"
 	"github.com/geschke/invafetch/pkg/dbconn"
-	"github.com/geschke/invafetch/pkg/invdb"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -104,10 +103,10 @@ func GetDbConfig() dbconn.DatabaseConfiguration {
 
 func infoDb() {
 	fmt.Println("Test")
-	config := dbconn.ConnectDB(GetDbConfig())
+	/*config := dbconn.ConnectDB(GetDbConfig())
 
 	repository := invdb.NewRepository(config)
-	repository.GetProcessdata()
+	repository.GetProcessdata()*/
 }
 
 // Handle info-related commands
