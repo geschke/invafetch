@@ -25,6 +25,16 @@ type HomeConsumption struct {
 	HomeBatP    string
 }
 
+type DevicesLocalBatteryLast struct {
+	ID              int64
+	DateCreated     string
+	BatManufacturer string
+	BatModel        string
+	BatSerialNo     string
+	BatVersionFW    string
+	Cycles          string
+}
+
 type Repository struct {
 	db *sql.DB
 }
@@ -73,6 +83,47 @@ func (r *Repository) GetHomeConsumption() HomeConsumption {
 		log.Println("Request: ")
 
 		values = HomeConsumption{ID: id, DateCreated: dt_created, HomeOwnP: home_own_p, HomePvP: home_pv_p, HomeP: home_p, HomeGridP: home_grid_p, HomeBatP: home_bat_p}
+
+	}
+	return values
+
+}
+
+// GetHomeConsumption loads home consumption values from database as average of the last 1 minute
+func (r *Repository) GetDevicesLocalBatteryLast() DevicesLocalBatteryLast {
+
+	var values DevicesLocalBatteryLast
+
+	results, err := r.db.Query("SELECT id, dt_created, JSON_VALUE(processdata,'$.devices:local:battery.BatManufacturer.value') AS bat_manufacturer, JSON_VALUE(processdata,'$.devices:local:battery.BatModel.value') AS bat_model, JSON_VALUE(processdata,'$.devices:local:battery.BatSerialNo.value') AS bat_serial_no, JSON_VALUE(processdata,'$.devices:local:battery.BatVersionFW.value') AS bat_version_fw, JSON_VALUE(processdata,'$.devices:local:battery.Cycles.value') AS cycles FROM solardata order by dt_created desc LIMIT 0,1")
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocalBatteryLast: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	//defer r.db.Close()
+
+	log.Println("items in database:")
+	//fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", "Host", "Created", "Updated")
+	var id int64
+	var dt_created string
+	var bat_manufacturer, bat_model, bat_serial_no, bat_version_fw, cycles string
+
+	for results.Next() {
+
+		// for each row, scan the result into our tag composite object
+		err = results.Scan(&id, &dt_created, &bat_manufacturer, &bat_model, &bat_serial_no, &bat_version_fw, &cycles)
+		if err != nil {
+			log.Println(err.Error()) // proper error handling instead of panic in your app
+			os.Exit(1)
+		}
+		// and then print out the tag's Name attribute
+		//fmt.Printf("%-"+fmt.Sprintf("%d", maxStrlen)+"s%-21s%-21s\n", host+"."+domainname, dtCreated, dtUpdated)
+		log.Printf("%d %s %s %s %s %s %s\n", id, dt_created, bat_manufacturer, bat_model, bat_serial_no, bat_version_fw, cycles)
+		log.Println("Request: ")
+
+		values = DevicesLocalBatteryLast{ID: id, DateCreated: dt_created, BatManufacturer: bat_manufacturer, BatModel: bat_model, BatSerialNo: bat_serial_no, BatVersionFW: bat_version_fw, Cycles: cycles}
 
 	}
 	return values
