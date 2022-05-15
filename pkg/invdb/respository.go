@@ -35,6 +35,17 @@ type DevicesLocalBatteryLast struct {
 	Cycles          string
 }
 
+type DevicesLocalBattery struct {
+	ID              int64
+	DateCreated     string
+	FullChargeCap_E string
+	I               string
+	P               string
+	SoC             string
+	U               string
+	WorkCapacity    string
+}
+
 type Repository struct {
 	db *sql.DB
 }
@@ -89,7 +100,29 @@ func (r *Repository) GetHomeConsumption() HomeConsumption {
 
 }
 
-// GetHomeConsumption loads home consumption values from database as average of the last 1 minute
+// GetDevicesLocalBattery
+func (r *Repository) GetDevicesLocalBattery() DevicesLocalBattery {
+
+	var values DevicesLocalBattery
+	var id int64
+	var dt_created string
+	var full_charge_cap_e, i, p, soc, u, work_capacity string
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local:battery.FullChargeCap_E.value')) AS full_charge_cap_e, avg(JSON_VALUE(processdata,'$.devices:local:battery.I.value')) AS i, avg(JSON_VALUE(processdata,'$.devices:local:battery.P.value')) AS p, avg(JSON_VALUE(processdata,'$.devices:local:battery.SoC.value')) AS soc, avg(JSON_VALUE(processdata,'$.devices:local:battery.U.value')) AS u, avg(JSON_VALUE(processdata,'$.devices:local:battery.WorkCapacity.value')) AS work_capacity FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 1 Minute").Scan(&id, &dt_created, &full_charge_cap_e, &i, &p, &soc, &u, &work_capacity)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocalBattery: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	values = DevicesLocalBattery{FullChargeCap_E: full_charge_cap_e, I: i, P: p, SoC: soc, U: u, WorkCapacity: work_capacity}
+
+	return values
+
+}
+
+// GetDevicesLocalBatteryLast
 func (r *Repository) GetDevicesLocalBatteryLast() DevicesLocalBatteryLast {
 
 	var values DevicesLocalBatteryLast
