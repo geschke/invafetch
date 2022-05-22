@@ -25,6 +25,42 @@ type HomeConsumption struct {
 	HomeBatP    string
 }
 
+type DevicesLocal struct {
+	ID          int64
+	DateCreated string
+	Bat2Grid_P  string
+	Dc_P        string
+	DigitalIn   string
+	EM_State    string
+	Grid2Bat_P  string
+	Grid_L1_I   string
+	Grid_L1_P   string
+	Grid_L2_I   string
+	Grid_L2_P   string
+	Grid_L3_I   string
+	Grid_L3_P   string
+	Grid_P      string
+	Grid_Q      string
+	Grid_S      string
+	HomeBat_P   string
+	HomeGrid_P  string
+	HomeOwn_P   string
+	HomePv_P    string
+	Home_P      string
+	Iso_R       string
+	LimitEvuRel string
+	PV2Bat_P    string
+}
+
+type DevicesLocalLast struct {
+	ID            int64
+	DateCreated   string
+	InverterState string
+	SinkMax_P     string
+	SourceMax_P   string
+	WorkTime      string
+}
+
 type DevicesLocalBatteryLast struct {
 	ID              int64
 	DateCreated     string
@@ -159,6 +195,50 @@ func (r *Repository) GetDevicesLocalBatteryLast() DevicesLocalBatteryLast {
 		values = DevicesLocalBatteryLast{ID: id, DateCreated: dt_created, BatManufacturer: bat_manufacturer, BatModel: bat_model, BatSerialNo: bat_serial_no, BatVersionFW: bat_version_fw, Cycles: cycles}
 
 	}
+	return values
+
+}
+
+// GetDevicesLocal
+func (r *Repository) GetDevicesLocal() DevicesLocal {
+
+	var values DevicesLocal
+	var id int64
+	var dt_created string
+	var bat2grid_p, dc_p, digital_in, em_state, grid2bat_p, grid_l1_i, grid_l1_p, grid_l2_i, grid_l2_p, grid_l3_i, grid_l3_p, grid_p, grid_q, grid_s, home_bat_p, home_grid_p, home_own_p, home_pv_p, home_p, iso_r, limit_evu_rel, pv2bat_p string
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local.Bat2Grid_P.value')) AS bat2grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Dc_P.value')) AS dc_p, avg(JSON_VALUE(processdata,'$.devices:local.DigitalIn.value')) AS digital_in, avg(JSON_VALUE(processdata,'$.devices:local.EM_State.value')) AS em_state, avg(JSON_VALUE(processdata,'$.devices:local.Grid2Bat_P.value')) AS grid2bat_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_I.value')) AS grid_l1_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_P.value')) AS grid_l1_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_P.value')) AS grid_l1_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_I.value')) AS grid_l2_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_P.value')) AS grid_l2_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_I.value')) AS grid_l3_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_P.value')) AS grid_l3_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_P.value')) AS grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_Q.value')) AS grid_q, avg(JSON_VALUE(processdata,'$.devices:local.Grid_S.value')) AS grid_s, avg(JSON_VALUE(processdata,'$.devices:local.HomeBat_P.value')) AS home_bat_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeGrid_P.value')) AS home_grid_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeOwn_P.value')) AS home_own_p, avg(JSON_VALUE(processdata,'$.devices:local.HomePv_P.value')) AS home_pv_p, avg(JSON_VALUE(processdata,'$.devices:local.Home_P.value')) AS home_p, avg(JSON_VALUE(processdata,'$.devices:local.Iso_R.value')) AS iso_r, avg(JSON_VALUE(processdata,'$.devices:local.LimitEvuRel.value')) AS limit_evu_rel, avg(JSON_VALUE(processdata,'$.devices:local.PV2Bat_P.value')) AS pv2bat_p FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&id, &dt_created, &bat2grid_p, &dc_p, &digital_in, &em_state, &grid2bat_p, &grid_l1_i, &grid_l1_p, &grid_l2_i, &grid_l2_p, &grid_l3_i, &grid_l3_p, &grid_p, &grid_q, &grid_s, &home_bat_p, &home_grid_p, &home_own_p, &home_own_p, &home_pv_p, &home_p, &iso_r, &limit_evu_rel, &pv2bat_p)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocal: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	values = DevicesLocal{Bat2Grid_P: bat2grid_p, Dc_P: dc_p, DigitalIn: digital_in, EM_State: em_state, Grid2Bat_P: grid2bat_p, Grid_L1_I: grid_l1_i, Grid_L1_P: grid_l1_p, Grid_L2_I: grid_l2_i, Grid_L2_P: grid_l2_p, Grid_L3_I: grid_l3_i, Grid_L3_P: grid_l3_p, Grid_P: grid_p, Grid_Q: grid_q, Grid_S: grid_s, HomeBat_P: home_bat_p, HomeGrid_P: home_grid_p, HomeOwn_P: home_own_p, HomePv_P: home_pv_p, Home_P: home_p, Iso_R: iso_r, LimitEvuRel: limit_evu_rel, PV2Bat_P: pv2bat_p}
+
+	return values
+
+}
+
+// GetDevicesLocalLast
+func (r *Repository) GetDevicesLocalLast() DevicesLocalLast {
+
+	var values DevicesLocalLast
+	var id int64
+	var dt_created string
+	var inverter_state, sink_max_p, source_max_p, work_time string
+
+	err := r.db.QueryRow("SELECT id, dt_created, JSON_VALUE(processdata,'$.devices:local.Inverter:State.value') AS inverter_state, JSON_VALUE(processdata,'$.devices:local.SinkMax_P.value') AS sink_max_p, JSON_VALUE(processdata,'$.devices:local.SourceMax_P.value') AS source_max_p, JSON_VALUE(processdata,'$.devices:local.WorkTime.value') AS work_time FROM solardata order by dt_created desc LIMIT 0,1").Scan(&id, &dt_created, &inverter_state, &sink_max_p, &source_max_p, &work_time)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocalLast: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	values = DevicesLocalLast{InverterState: inverter_state, SinkMax_P: sink_max_p, SourceMax_P: source_max_p, WorkTime: work_time}
+
 	return values
 
 }
