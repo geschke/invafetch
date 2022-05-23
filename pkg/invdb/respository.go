@@ -52,6 +52,28 @@ type DevicesLocal struct {
 	PV2Bat_P    string
 }
 
+type DevicesLocalAc struct {
+	ID            int64
+	DateCreated   string
+	CosPhi        string
+	Frequency     string
+	InvIn_P       string
+	InvOut_P      string
+	L1_I          string
+	L1_P          string
+	L1_U          string
+	L2_I          string
+	L2_P          string
+	L2_U          string
+	L3_I          string
+	L3_P          string
+	L3_U          string
+	P             string
+	Q             string
+	ResidualCDc_I string
+	S             string
+}
+
 type DevicesLocalLast struct {
 	ID            int64
 	DateCreated   string
@@ -216,6 +238,28 @@ func (r *Repository) GetDevicesLocal() DevicesLocal {
 	}
 
 	values = DevicesLocal{Bat2Grid_P: bat2grid_p, Dc_P: dc_p, DigitalIn: digital_in, EM_State: em_state, Grid2Bat_P: grid2bat_p, Grid_L1_I: grid_l1_i, Grid_L1_P: grid_l1_p, Grid_L2_I: grid_l2_i, Grid_L2_P: grid_l2_p, Grid_L3_I: grid_l3_i, Grid_L3_P: grid_l3_p, Grid_P: grid_p, Grid_Q: grid_q, Grid_S: grid_s, HomeBat_P: home_bat_p, HomeGrid_P: home_grid_p, HomeOwn_P: home_own_p, HomePv_P: home_pv_p, Home_P: home_p, Iso_R: iso_r, LimitEvuRel: limit_evu_rel, PV2Bat_P: pv2bat_p}
+
+	return values
+
+}
+
+// GetDevicesLocal
+func (r *Repository) GetDevicesLocalAc() DevicesLocalAc {
+
+	var values DevicesLocalAc
+	var id int64
+	var dt_created string
+	var cos_phi, frequency, inv_in_p, inv_out_p, l1_i, l1_p, l1_u, l2_i, l2_p, l2_u, l3_i, l3_p, l3_u, p, q, residual_cdc_i, s string
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local:ac.CosPhi.value')) AS cos_phi, avg(JSON_VALUE(processdata,'$.devices:local:ac.Frequency.value')) AS frequency, avg(JSON_VALUE(processdata,'$.devices:local:ac.InvIn_P.value')) AS inv_in_p, avg(JSON_VALUE(processdata,'$.devices:local:ac.InvOut_P.value')) AS inv_out_p, avg(JSON_VALUE(processdata,'$.devices:local:ac.L1_I.value')) AS l1_i, avg(JSON_VALUE(processdata,'$.devices:local:ac.L1_P.value')) AS l1_p, avg(JSON_VALUE(processdata,'$.devices:local:ac.L1_U.value')) AS l1_u, avg(JSON_VALUE(processdata,'$.devices:local:ac.L2_I.value')) AS l2_i, avg(JSON_VALUE(processdata,'$.devices:local:ac.L2_P.value')) AS l2_p, avg(JSON_VALUE(processdata,'$.devices:local:ac.L2_U.value')) AS l2_u, avg(JSON_VALUE(processdata,'$.devices:local:ac.L3_I.value')) AS l3_i, avg(JSON_VALUE(processdata,'$.devices:local:ac.L3_P.value')) AS l3_p, avg(JSON_VALUE(processdata,'$.devices:local:ac.L3_U.value')) AS l3_u, avg(JSON_VALUE(processdata,'$.devices:local:ac.P.value')) AS p, avg(JSON_VALUE(processdata,'$.devices:local:ac.Q.value')) AS q, avg(JSON_VALUE(processdata,'$.devices:local:ac.ResidualCDc_I.value')) AS residual_cdc_i, avg(JSON_VALUE(processdata,'$.devices:local:ac.S.value')) AS s FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&id, &dt_created, &cos_phi, &frequency, &inv_in_p, &inv_out_p, &l1_i, &l1_p, &l1_u, &l2_i, &l2_p, &l2_u, &l3_i, &l3_p, &l3_u, &p, &q, &residual_cdc_i, &s)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocal: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	values = DevicesLocalAc{CosPhi: cos_phi, Frequency: frequency, InvIn_P: inv_in_p, InvOut_P: inv_out_p, L1_I: l1_i, L1_P: l1_p, L1_U: l1_u, L2_I: l2_i, L2_P: l2_p, L2_U: l2_u, L3_I: l3_i, L3_P: l3_p, L3_U: l3_u, P: p, Q: q, ResidualCDc_I: residual_cdc_i, S: s}
 
 	return values
 
