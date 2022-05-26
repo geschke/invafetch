@@ -104,6 +104,94 @@ type DevicesLocalBattery struct {
 	WorkCapacity    string
 }
 
+type DevicesLocalPowermeter struct {
+	ID          int64
+	DateCreated string
+	CosPhi      string
+	Frequency   string
+	P           string
+	Q           string
+	S           string
+}
+
+type DevicesLocalPv struct {
+	ID          int64
+	DateCreated string
+	I           string
+	P           string
+	U           string
+}
+
+type StatisticEnergyFlowLast struct {
+	ID                                int64
+	DateCreated                       string
+	StatisticAutarkyDay               string
+	StatisticAutarkyMonth             string
+	StatisticAutarkyTotal             string
+	StatisticAutarkyYear              string
+	StatisticCO2SavingDay             string
+	StatisticCO2SavingMonth           string
+	StatisticCO2SavingTotal           string
+	StatisticCO2SavingYear            string
+	StatisticEnergyChargeGridDay      string
+	StatisticEnergyChargeGridMonth    string
+	StatisticEnergyChargeGridTotal    string
+	StatisticEnergyChargeGridYear     string
+	StatisticEnergyChargeInvInDay     string
+	StatisticEnergyChargeInvInMonth   string
+	StatisticEnergyChargeInvInTotal   string
+	StatisticEnergyChargeInvInYear    string
+	StatisticEnergyChargePvDay        string
+	StatisticEnergyChargePvMonth      string
+	StatisticEnergyChargePvTotal      string
+	StatisticEnergyChargePvYear       string
+	StatisticEnergyDischargeDay       string
+	StatisticEnergyDischargeMonth     string
+	StatisticEnergyDischargeTotal     string
+	StatisticEnergyDischargeYear      string
+	StatisticEnergyDischargeGridDay   string
+	StatisticEnergyDischargeGridMonth string
+	StatisticEnergyDischargeGridTotal string
+	StatisticEnergyDischargeGridYear  string
+	StatisticEnergyHomeDay            string
+	StatisticEnergyHomeMonth          string
+	StatisticEnergyHomeTotal          string
+	StatisticEnergyHomeYear           string
+	StatisticEnergyHomeBatDay         string
+	StatisticEnergyHomeBatMonth       string
+	StatisticEnergyHomeBatTotal       string
+	StatisticEnergyHomeBatYear        string
+	StatisticEnergyHomeGridDay        string
+	StatisticEnergyHomeGridMonth      string
+	StatisticEnergyHomeGridTotal      string
+	StatisticEnergyHomeGridYear       string
+	StatisticEnergyHomeOwnTotal       string
+	StatisticEnergyHomePvDay          string
+	StatisticEnergyHomePvMonth        string
+	StatisticEnergyHomePvTotal        string
+	StatisticEnergyHomePvYear         string
+	StatisticEnergyPv1Day             string
+	StatisticEnergyPv1Month           string
+	StatisticEnergyPv1Total           string
+	StatisticEnergyPv1Year            string
+	StatisticEnergyPv2Day             string
+	StatisticEnergyPv2Month           string
+	StatisticEnergyPv2Total           string
+	StatisticEnergyPv2Year            string
+	StatisticEnergyPv3Day             string
+	StatisticEnergyPv3Month           string
+	StatisticEnergyPv3Total           string
+	StatisticEnergyPv3Year            string
+	StatisticOwnConsumptionRateDay    string
+	StatisticOwnConsumptionRateMonth  string
+	StatisticOwnConsumptionRateTotal  string
+	StatisticOwnConsumptionRateYear   string
+	StatisticYieldDay                 string
+	StatisticYieldMonth               string
+	StatisticYieldTotal               string
+	StatisticYieldYear                string
+}
+
 type Repository struct {
 	db *sql.DB
 }
@@ -225,11 +313,8 @@ func (r *Repository) GetDevicesLocalBatteryLast() DevicesLocalBatteryLast {
 func (r *Repository) GetDevicesLocal() DevicesLocal {
 
 	var values DevicesLocal
-	var id int64
-	var dt_created string
-	var bat2grid_p, dc_p, digital_in, em_state, grid2bat_p, grid_l1_i, grid_l1_p, grid_l2_i, grid_l2_p, grid_l3_i, grid_l3_p, grid_p, grid_q, grid_s, home_bat_p, home_grid_p, home_own_p, home_pv_p, home_p, iso_r, limit_evu_rel, pv2bat_p string
 
-	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local.Bat2Grid_P.value')) AS bat2grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Dc_P.value')) AS dc_p, avg(JSON_VALUE(processdata,'$.devices:local.DigitalIn.value')) AS digital_in, avg(JSON_VALUE(processdata,'$.devices:local.EM_State.value')) AS em_state, avg(JSON_VALUE(processdata,'$.devices:local.Grid2Bat_P.value')) AS grid2bat_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_I.value')) AS grid_l1_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_P.value')) AS grid_l1_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_P.value')) AS grid_l1_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_I.value')) AS grid_l2_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_P.value')) AS grid_l2_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_I.value')) AS grid_l3_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_P.value')) AS grid_l3_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_P.value')) AS grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_Q.value')) AS grid_q, avg(JSON_VALUE(processdata,'$.devices:local.Grid_S.value')) AS grid_s, avg(JSON_VALUE(processdata,'$.devices:local.HomeBat_P.value')) AS home_bat_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeGrid_P.value')) AS home_grid_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeOwn_P.value')) AS home_own_p, avg(JSON_VALUE(processdata,'$.devices:local.HomePv_P.value')) AS home_pv_p, avg(JSON_VALUE(processdata,'$.devices:local.Home_P.value')) AS home_p, avg(JSON_VALUE(processdata,'$.devices:local.Iso_R.value')) AS iso_r, avg(JSON_VALUE(processdata,'$.devices:local.LimitEvuRel.value')) AS limit_evu_rel, avg(JSON_VALUE(processdata,'$.devices:local.PV2Bat_P.value')) AS pv2bat_p FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&id, &dt_created, &bat2grid_p, &dc_p, &digital_in, &em_state, &grid2bat_p, &grid_l1_i, &grid_l1_p, &grid_l2_i, &grid_l2_p, &grid_l3_i, &grid_l3_p, &grid_p, &grid_q, &grid_s, &home_bat_p, &home_grid_p, &home_own_p, &home_own_p, &home_pv_p, &home_p, &iso_r, &limit_evu_rel, &pv2bat_p)
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local.Bat2Grid_P.value')) AS bat2grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Dc_P.value')) AS dc_p, avg(JSON_VALUE(processdata,'$.devices:local.DigitalIn.value')) AS digital_in, avg(JSON_VALUE(processdata,'$.devices:local.EM_State.value')) AS em_state, avg(JSON_VALUE(processdata,'$.devices:local.Grid2Bat_P.value')) AS grid2bat_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_I.value')) AS grid_l1_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L1_P.value')) AS grid_l1_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_I.value')) AS grid_l2_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L2_P.value')) AS grid_l2_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_I.value')) AS grid_l3_i, avg(JSON_VALUE(processdata,'$.devices:local.Grid_L3_P.value')) AS grid_l3_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_P.value')) AS grid_p, avg(JSON_VALUE(processdata,'$.devices:local.Grid_Q.value')) AS grid_q, avg(JSON_VALUE(processdata,'$.devices:local.Grid_S.value')) AS grid_s, avg(JSON_VALUE(processdata,'$.devices:local.HomeBat_P.value')) AS home_bat_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeGrid_P.value')) AS home_grid_p, avg(JSON_VALUE(processdata,'$.devices:local.HomeOwn_P.value')) AS home_own_p, avg(JSON_VALUE(processdata,'$.devices:local.HomePv_P.value')) AS home_pv_p, avg(JSON_VALUE(processdata,'$.devices:local.Home_P.value')) AS home_p, avg(JSON_VALUE(processdata,'$.devices:local.Iso_R.value')) AS iso_r, avg(JSON_VALUE(processdata,'$.devices:local.LimitEvuRel.value')) AS limit_evu_rel, avg(JSON_VALUE(processdata,'$.devices:local.PV2Bat_P.value')) AS pv2bat_p FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&values.ID, &values.DateCreated, &values.Bat2Grid_P, &values.Dc_P, &values.DigitalIn, &values.EM_State, &values.Grid2Bat_P, &values.Grid_L1_I, &values.Grid_L1_P, &values.Grid_L2_I, &values.Grid_L2_P, &values.Grid_L3_I, &values.Grid_L3_P, &values.Grid_P, &values.Grid_Q, &values.Grid_S, &values.HomeBat_P, &values.HomeGrid_P, &values.HomeOwn_P, &values.HomePv_P, &values.Home_P, &values.Iso_R, &values.LimitEvuRel, &values.PV2Bat_P)
 
 	if err != nil {
 		log.Println("Database problem in GetDevicesLocal: " + err.Error())
@@ -237,13 +322,11 @@ func (r *Repository) GetDevicesLocal() DevicesLocal {
 		//panic(err.Error()) // proper error handling instead of panic in your app
 	}
 
-	values = DevicesLocal{Bat2Grid_P: bat2grid_p, Dc_P: dc_p, DigitalIn: digital_in, EM_State: em_state, Grid2Bat_P: grid2bat_p, Grid_L1_I: grid_l1_i, Grid_L1_P: grid_l1_p, Grid_L2_I: grid_l2_i, Grid_L2_P: grid_l2_p, Grid_L3_I: grid_l3_i, Grid_L3_P: grid_l3_p, Grid_P: grid_p, Grid_Q: grid_q, Grid_S: grid_s, HomeBat_P: home_bat_p, HomeGrid_P: home_grid_p, HomeOwn_P: home_own_p, HomePv_P: home_pv_p, Home_P: home_p, Iso_R: iso_r, LimitEvuRel: limit_evu_rel, PV2Bat_P: pv2bat_p}
-
 	return values
 
 }
 
-// GetDevicesLocal
+// GetDevicesLocalAc
 func (r *Repository) GetDevicesLocalAc() DevicesLocalAc {
 
 	var values DevicesLocalAc
@@ -263,6 +346,51 @@ func (r *Repository) GetDevicesLocalAc() DevicesLocalAc {
 
 	return values
 
+}
+
+// GetDevicesLocalPowermeter
+func (r *Repository) GetDevicesLocalPowermeter() DevicesLocalPowermeter {
+
+	var values DevicesLocalPowermeter
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local:powermeter.CosPhi.value')) AS cos_phi, avg(JSON_VALUE(processdata,'$.devices:local:powermeter.Frequency.value')) AS frequency, avg(JSON_VALUE(processdata,'$.devices:local:powermeter.P.value')) AS p, avg(JSON_VALUE(processdata,'$.devices:local:powermeter.Q.value')) AS q, avg(JSON_VALUE(processdata,'$.devices:local:powermeter.S.value')) AS s FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&values.ID, &values.DateCreated, &values.CosPhi, &values.Frequency, &values.P, &values.Q, &values.S)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocal: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+	return values
+}
+
+// GetDevicesLocalPv1
+func (r *Repository) GetDevicesLocalPv1() DevicesLocalPv {
+
+	var values DevicesLocalPv
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local:pv1.I.value')) AS i, avg(JSON_VALUE(processdata,'$.devices:local:pv1.P.value')) AS p, avg(JSON_VALUE(processdata,'$.devices:local:pv1.U.value')) AS u FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&values.ID, &values.DateCreated, &values.I, &values.P, &values.U)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesPv1: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+	return values
+}
+
+// GetDevicesLocalPv2
+func (r *Repository) GetDevicesLocalPv2() DevicesLocalPv {
+
+	var values DevicesLocalPv
+
+	err := r.db.QueryRow("SELECT id, dt_created, avg(JSON_VALUE(processdata,'$.devices:local:pv2.I.value')) AS i, avg(JSON_VALUE(processdata,'$.devices:local:pv2.P.value')) AS p, avg(JSON_VALUE(processdata,'$.devices:local:pv2.U.value')) AS u FROM solardata WHERE dt_created < NOW() AND dt_created > NOW() - INTERVAL 5 Minute").Scan(&values.ID, &values.DateCreated, &values.I, &values.P, &values.U)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesPv2: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+	return values
 }
 
 // GetDevicesLocalLast
@@ -287,12 +415,31 @@ func (r *Repository) GetDevicesLocalLast() DevicesLocalLast {
 
 }
 
-// AddAssetTransaction adds dataset to transactions_assets table, which is a representation of asset-wide manual actions
+// GetDevicesLocalLast
+func (r *Repository) GetStatisticEnergyFlowLast() StatisticEnergyFlowLast {
+
+	var v StatisticEnergyFlowLast
+
+	err := r.db.QueryRow("SELECT id, dt_created, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Autarky:Day.value') AS statistic_autarky_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Autarky:Month.value') AS statistic_autarky_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Autarky:Total.value') AS statistic_autarky_total, 	JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Autarky:Year.value') AS statistic_autarky_year, 	JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:CO2Saving:Day.value') AS statistic_co2saving_day, 	JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:CO2Saving:Month.value') AS statistic_co2saving_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:CO2Saving:Total.value') AS statistic_co2saving_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:CO2Saving:Year.value') AS statistic_co2saving_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeGrid:Day.value') AS statistic_energy_charge_grid_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeGrid:Month.value') AS statistic_energy_charge_grid_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeGrid:Total.value') AS statistic_energy_charge_grid_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeGrid:Year.value') AS statistic_energy_charge_grid_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeInvIn:Day.value') AS statistic_energy_charge_inv_in_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeInvIn:Month.value') AS statistic_energy_charge_inv_in_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeInvIn:Total.value') AS statistic_energy_charge_inv_in_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargeInvIn:Year.value') AS statistic_energy_charge_inv_in_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargePv:Day.value') AS statistic_energy_charge_pv_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargePv:Month.value') AS statistic_energy_charge_pv_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargePv:Total.value') AS statistic_energy_charge_pv_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyChargePv:Year.value') AS statistic_energy_charge_pv_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischarge:Day.value') AS statistic_energy_discharge_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischarge:Month.value') AS statistic_energy_discharge_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischarge:Total.value') AS statistic_energy_discharge_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischarge:Year.value') AS statistic_energy_discharge_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischargeGrid:Day.value') AS statistic_energy_discharge_grid_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischargeGrid:Month.value') AS statistic_energy_discharge_grid_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischargeGrid:Total.value') AS statistic_energy_discharge_grid_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyDischargeGrid:Year.value') AS statistic_energy_discharge_grid_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHome:Day.value') AS statistic_energy_home_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHome:Month.value') AS statistic_energy_home_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHome:Total.value') AS statistic_energy_home_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHome:Year.value') AS statistic_energy_home_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeBat:Day.value') AS statistic_energy_home_bat_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeBat:Month.value') AS statistic_energy_home_bat_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeBat:Total.value') AS statistic_energy_home_bat_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeBat:Year.value') AS statistic_energy_home_bat_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeGrid:Day.value') AS statistic_energy_home_grid_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeGrid:Month.value') AS statistic_energy_home_grid_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeGrid:Total.value') AS statistic_energy_home_grid_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeGrid:Year.value') AS statistic_energy_home_grid_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomeOwn:Total.value') AS statistic_energy_home_own_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomePv:Day.value') AS statistic_energy_home_pv_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomePv:Month.value') AS statistic_energy_home_pv_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomePv:Total.value') AS statistic_energy_home_pv_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyHomePv:Year.value') AS statistic_energy_home_pv_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv1:Day.value') AS statistic_energy_pv1_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv1:Month.value') AS statistic_energy_pv1_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv1:Total.value') AS statistic_energy_pv1_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv1:Year.value') AS statistic_energy_pv1_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv2:Day.value') AS statistic_energy_pv2_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv2:Month.value') AS statistic_energy_pv2_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv2:Total.value') AS statistic_energy_pv2_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv2:Year.value') AS statistic_energy_pv2_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv3:Day.value') AS statistic_energy_pv3_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv3:Month.value') AS statistic_energy_pv3_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv3:Total.value') AS statistic_energy_pv3_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:EnergyPv3:Year.value') AS statistic_energy_pv3_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:OwnConsumptionRate:Day.value') AS statistic_own_consumption_rate_day, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:OwnConsumptionRate:Month.value') AS statistic_own_consumption_rate_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:OwnConsumptionRate:Total.value') AS statistic_own_consumption_rate_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:OwnConsumptionRate:Year.value') AS statistic_own_consumption_rate_year, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Yield:Day.value') AS statistic_yield_day, 	JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Yield:Month.value') AS statistic_yield_month, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Yield:Total.value') AS statistic_yield_total, JSON_VALUE(processdata,'$.scb:statistic:EnergyFlow.Statistic:Yield:Year.value') AS statistic_yield_year FROM solardata order by dt_created desc LIMIT 0,1").Scan(&v.ID, &v.DateCreated, &v.StatisticAutarkyDay, &v.StatisticAutarkyMonth, &v.StatisticAutarkyTotal, &v.StatisticAutarkyYear, &v.StatisticCO2SavingDay, &v.StatisticCO2SavingMonth, &v.StatisticCO2SavingTotal, &v.StatisticCO2SavingYear, &v.StatisticEnergyChargeGridDay, &v.StatisticEnergyChargeGridMonth, &v.StatisticEnergyChargeGridTotal, &v.StatisticEnergyChargeGridYear, &v.StatisticEnergyChargeInvInDay, &v.StatisticEnergyChargeInvInMonth, &v.StatisticEnergyChargeInvInTotal, &v.StatisticEnergyChargeInvInYear, &v.StatisticEnergyChargePvDay, &v.StatisticEnergyChargePvMonth, &v.StatisticEnergyChargePvTotal, &v.StatisticEnergyChargePvYear, &v.StatisticEnergyDischargeDay, &v.StatisticEnergyDischargeMonth, &v.StatisticEnergyDischargeTotal, &v.StatisticEnergyDischargeYear, &v.StatisticEnergyDischargeGridDay, &v.StatisticEnergyDischargeGridMonth, &v.StatisticEnergyDischargeGridTotal, &v.StatisticEnergyDischargeGridYear, &v.StatisticEnergyHomeDay, &v.StatisticEnergyHomeMonth, &v.StatisticEnergyHomeTotal, &v.StatisticEnergyHomeYear, &v.StatisticEnergyHomeBatDay, &v.StatisticEnergyHomeBatMonth, &v.StatisticEnergyHomeBatTotal, &v.StatisticEnergyHomeBatYear, &v.StatisticEnergyHomeGridDay, &v.StatisticEnergyHomeGridMonth, &v.StatisticEnergyHomeGridTotal, &v.StatisticEnergyHomeGridYear, &v.StatisticEnergyHomeOwnTotal, &v.StatisticEnergyHomePvDay, &v.StatisticEnergyHomePvMonth, &v.StatisticEnergyHomePvTotal, &v.StatisticEnergyHomePvYear, &v.StatisticEnergyPv1Day, &v.StatisticEnergyPv1Month, &v.StatisticEnergyPv1Total, &v.StatisticEnergyPv1Year, &v.StatisticEnergyPv2Day, &v.StatisticEnergyPv2Month, &v.StatisticEnergyPv2Total, &v.StatisticEnergyPv2Year, &v.StatisticEnergyPv3Day, &v.StatisticEnergyPv3Month, &v.StatisticEnergyPv3Total, &v.StatisticEnergyPv3Year, &v.StatisticOwnConsumptionRateDay, &v.StatisticOwnConsumptionRateMonth, &v.StatisticOwnConsumptionRateTotal, &v.StatisticOwnConsumptionRateYear, &v.StatisticYieldDay, &v.StatisticYieldMonth, &v.StatisticYieldTotal, &v.StatisticYieldYear)
+
+	if err != nil {
+		log.Println("Database problem in GetDevicesLocalLast: " + err.Error())
+		os.Exit(1)
+		//panic(err.Error()) // proper error handling instead of panic in your app
+	}
+
+	//values = DevicesLocalLast{InverterState: inverter_state, SinkMax_P: sink_max_p, SourceMax_P: source_max_p, WorkTime: work_time}
+
+	return v
+
+}
+
+// AddData adds dataset with JSON payload to solardata table
 func (r *Repository) AddData(payload string) (int64, error) {
 
-	log.Println("in addData...")
+	//log.Println("in addData...")
 
-	fmt.Println("mit payload:", payload)
+	//fmt.Println("mit payload:", payload)
 
 	result, err := r.db.Prepare("INSERT INTO solardata (processdata) VALUES(?)")
 	if err != nil {
@@ -302,10 +449,10 @@ func (r *Repository) AddData(payload string) (int64, error) {
 		//os.Exit(1)
 	}
 
-	res, insertErr := result.Exec(payload)
-	if insertErr != nil {
+	res, err := result.Exec(payload)
+	if err != nil {
 		//fmt.Println(insertErr.Error())
-		return -1, insertErr
+		return -1, err
 		//fmt.Println(insertErr.Error())
 		//os.Exit(1)
 	}
@@ -314,34 +461,30 @@ func (r *Repository) AddData(payload string) (int64, error) {
 	return res.LastInsertId()
 }
 
-/*
-// GetAssetEntry returns an AssetEntry type for an asset found in database
-func (r *StockRepository) GetAssetEntry(assetID int) AssetEntry {
+func (r *Repository) RemoveData(olderThanDays int) {
 
-	//err := db.QueryRowContext(ctx, "SELECT username, created_at FROM users WHERE id=?", id).Scan(&username, &created)
-
-	var id, datasourceID, assetTypeID int64
-	var isin, wkn, symbolName, symbolShort, description string
-	var resultEntry AssetEntry
-
-	err := r.db.QueryRow("SELECT sm.id, sm.isin, sm.wkn, sm.symbol_name, sm.symbol_short, sm.description, sm.datasource_id, sm.asset_type FROM symbolmeta sm WHERE sm.id=?", assetID).Scan(&id, &isin, &wkn, &symbolName, &symbolShort, &description, &datasourceID, &assetTypeID)
-
+	result, err := r.db.Prepare("DELETE FROM solardata WHERE dt_created < NOW() - INTERVAL ? DAY")
 	if err != nil {
-		log.Println("Database problem in GetAssetEntry: " + err.Error())
+		fmt.Println(err.Error())
 		os.Exit(1)
-		//panic(err.Error()) // proper error handling instead of panic in your app
 	}
 
-	resultEntry.ID = id
-	resultEntry.Isin = isin
-	resultEntry.SymbolName = symbolName
-	resultEntry.SymbolShort = symbolShort
-	resultEntry.Description = description
-	resultEntry.Wkn = wkn
-	resultEntry.DatasourceID = datasourceID
-	resultEntry.AssetTypeID = assetTypeID
+	deleteResult, err := result.Exec(olderThanDays)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 
-	return resultEntry
+	rowsAffected, err := deleteResult.RowsAffected()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	if rowsAffected == 0 {
+		fmt.Println("Nothing deleted")
+	} else {
+		fmt.Println(rowsAffected, " removed successfully")
+
+	}
 
 }
-*/
