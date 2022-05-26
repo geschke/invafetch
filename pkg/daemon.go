@@ -124,7 +124,7 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 }
 
 func (cd *CollectDaemon) outerLoop(ctx context.Context) {
-	timer1 := time.NewTimer(10 * time.Hour)
+	//timer1 := time.NewTimer(10 * time.Hour)
 
 	log.Println("in outerLoop start")
 	id := 0
@@ -156,12 +156,12 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 	for active := true; active; {
 		select {
 
-		case <-timer1.C:
-			log.Println("timer1 Out fired, simulates end of program, give time to end innerLoop", time.Now())
-			done <- true
-			time.Sleep(100 * time.Millisecond)
-			active = false
-
+		/*case <-timer1.C:
+		log.Println("timer1 Out fired, simulates end of program, give time to end innerLoop", time.Now())
+		done <- true
+		time.Sleep(100 * time.Millisecond)
+		active = false
+		*/
 		case <-ctx.Done():
 			log.Println("ctx done in main fired!")
 			log.Println("Wait time of innerLoop to let it end gracefully...")
@@ -240,71 +240,6 @@ func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
 }
 
 func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
-	/*
-		pdv := golrackpi.ProcessDataValue{
-			Unit:  "",
-			Id:    "Statistic:CO2Saving:Day",
-			Value: 16672.1581222652,
-		}
-
-		pdv2 := golrackpi.ProcessDataValue{
-			Unit:  "",
-			Id:    "Statistic:Foo",
-			Value: 10,
-		}
-
-		pdv3 := golrackpi.ProcessDataValue{
-			Unit:  "",
-			Id:    "Statistic:CO2Saving:Day",
-			Value: 16672.1581222652,
-		}
-
-		pdv4 := golrackpi.ProcessDataValue{
-			Unit:  "",
-			Id:    "Statistic:Bar",
-			Value: 20000,
-		}
-
-		//pdvj := ProcessDataValueJSON(pdv)
-		//pdvj2 := ProcessDataValueJSON(pdv2)
-
-		var pdvarr []golrackpi.ProcessDataValue
-		var pdvarr2 []golrackpi.ProcessDataValue
-		//pdvarr = append(pdvarr, pdvj, pdvj2)
-		pdvarr = append(pdvarr, pdv, pdv2)
-		pdvarr2 = append(pdvarr2, pdv2, pdv3, pdv4)
-
-		var pdvsarr []golrackpi.ProcessDataValues
-
-		pdvs := golrackpi.ProcessDataValues{
-			ModuleId:    "scb:statistic:EnergyFlow",
-			ProcessData: pdvarr,
-		}
-
-		pdvs2 := golrackpi.ProcessDataValues{
-			ModuleId:    "scb:statistic:Nothing",
-			ProcessData: pdvarr2,
-		}
-
-		pdvsarr = append(pdvsarr, pdvs, pdvs2)
-
-		result := convertPdvsMap(pdvsarr)
-
-		//result := convertPdvMap(pdvarr)
-
-		//fmt.Println(pdv)
-		//fmt.Println(pdv2)
-		//fmt.Println(pdvarr)
-
-		fmt.Println("after convert", result)
-		jsonPdv, err := json.Marshal(result)
-		if err != nil {
-			fmt.Println("json convert error")
-		}
-		jsonOut := string(jsonPdv)
-		fmt.Println(jsonOut)
-		return
-	*/
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
 
