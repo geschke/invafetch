@@ -29,34 +29,7 @@ var (
 	}
 )
 
-var author string
-
 var authData golrackpi.AuthClient
-
-var (
-	outputCSV       bool   = false
-	outputFile      string = ""
-	outputTimestamp bool   = false
-	outputAppend    bool   = false
-	outputNoHeaders bool   = false
-)
-
-/*// LoadConfig uses the viper library to load and extract database configuration from .env file or environment variables
-func initConfig(path string) (config dbconn.DatabaseConfigurations, err error) {
-	viper.AddConfigPath(path)
-	viper.SetConfigName(".env")
-	viper.SetConfigType("env")
-
-	viper.AutomaticEnv()
-
-	err = viper.ReadInConfig()
-	if err != nil {
-		return
-	}
-
-	err = viper.Unmarshal(&config)
-	return
-}*/
 
 // init sets the global flags and their options.
 func init() {
@@ -86,7 +59,6 @@ func init() {
 	viper.BindPFlag("dbPort", rootCmd.PersistentFlags().Lookup("dbport"))
 
 	viper.SetDefault("dbPort", "3306")
-	//viper.SetDefault("dbuser", "solardbuser")
 
 }
 
