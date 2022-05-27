@@ -441,15 +441,14 @@ func (r *Repository) AddData(payload string) (int64, error) {
 
 	//fmt.Println("mit payload:", payload)
 
-	result, err := r.db.Prepare("INSERT INTO solardata (processdata) VALUES(?)")
+	stmt, err := r.db.Prepare("INSERT INTO solardata (processdata) VALUES(?)")
 	if err != nil {
-
 		fmt.Println(err.Error())
 		return -1, err
 		//os.Exit(1)
 	}
-
-	res, err := result.Exec(payload)
+	defer stmt.Close()
+	res, err := stmt.Exec(payload)
 	if err != nil {
 		//fmt.Println(insertErr.Error())
 		return -1, err
@@ -463,13 +462,14 @@ func (r *Repository) AddData(payload string) (int64, error) {
 
 func (r *Repository) RemoveData(olderThanDays int) {
 
-	result, err := r.db.Prepare("DELETE FROM solardata WHERE dt_created < NOW() - INTERVAL ? DAY")
+	stmt, err := r.db.Prepare("DELETE FROM solardata WHERE dt_created < NOW() - INTERVAL ? DAY")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+	defer stmt.Close()
 
-	deleteResult, err := result.Exec(olderThanDays)
+	deleteResult, err := stmt.Exec(olderThanDays)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
