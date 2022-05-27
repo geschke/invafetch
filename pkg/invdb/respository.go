@@ -415,7 +415,7 @@ func (r *Repository) GetDevicesLocalLast() DevicesLocalLast {
 
 }
 
-// GetDevicesLocalLast
+// GetStatisticEnergyFlowLast
 func (r *Repository) GetStatisticEnergyFlowLast() StatisticEnergyFlowLast {
 
 	var v StatisticEnergyFlowLast
