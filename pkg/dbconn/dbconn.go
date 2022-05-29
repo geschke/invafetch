@@ -18,13 +18,12 @@ type DatabaseConfiguration struct {
 // ConnectDB returns a database connection
 func ConnectDB(dbConfig DatabaseConfiguration) (db *sql.DB) {
 	var dsn string
-	//if len(dsn) < 1 {
-	dbname := dbConfig.DBName         // os.Getenv("DBNAME")
-	dbhost := dbConfig.DBHost         //os.Getenv("DBHOST")
-	dbuser := dbConfig.DBUser         // os.Getenv("DBUSER")
-	dbpassword := dbConfig.DBPassword //os.Getenv("DBPASSWORD")
+	dbname := dbConfig.DBName
+	dbhost := dbConfig.DBHost
+	dbuser := dbConfig.DBUser
+	dbpassword := dbConfig.DBPassword
 
-	dbport := dbConfig.DBPort // os.Getenv("DBPORT")
+	dbport := dbConfig.DBPort
 	if len(dbport) < 1 {
 		dbport = "3306"
 	}
@@ -32,11 +31,9 @@ func ConnectDB(dbConfig DatabaseConfiguration) (db *sql.DB) {
 		dsn = dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
 
 	} else {
-		fmt.Println("No database connect parameter found, exiting. Please use --dsn or environment variables to define database connection.")
+		fmt.Println("No database connect parameter found, exiting. Please use parameter or environment variables to define database connection.")
 		os.Exit(1)
 	}
-
-	//}
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {

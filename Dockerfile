@@ -23,4 +23,4 @@ COPY --from=builder /build/invafetch /app/
 #COPY --from=builder /build-cli/dynpower-cli /app/
 ENV PATH "$PATH:/app"
 WORKDIR /app
-#CMD ["./invafetch"] # todo: add CLI parameters?
+CMD ["./invafetch"]

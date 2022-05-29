@@ -74,10 +74,12 @@ func initConfig() {
 
 		// Search config in home directory with name ".cobra" (without extension).
 		viper.AddConfigPath(".")
+		viper.AddConfigPath("./config")
+		viper.AddConfigPath("/config")
 
-		viper.SetConfigName(".env")
-		viper.SetConfigType("env")
 	}
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
 
