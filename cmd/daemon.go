@@ -53,30 +53,6 @@ func readProcessdataConfig() ([]golrackpi.ProcessData, error) {
 }
 
 func startCollect() {
-	/*	lib := golrackpi.NewWithParameter(golrackpi.AuthClient{
-			Scheme:   authData.Scheme,
-			Server:   authData.Server,
-			Password: authData.Password,
-		})
-
-		_, err := lib.Login()
-
-		if err != nil {
-			fmt.Println("An error occurred:", err)
-			return
-		}
-		defer lib.Logout()
-
-		info, err := lib.Version()
-		if err != nil {
-			fmt.Println("An error occurred:", err)
-			return
-		}
-
-		for k, v := range info {
-			fmt.Printf("%s: %v\n", k, v)
-		}
-	*/
 
 	collectData, err := readProcessdataConfig()
 	if err != nil {

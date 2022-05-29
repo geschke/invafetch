@@ -24,36 +24,13 @@ type CollectDaemon struct {
 	lib      *golrackpi.AuthClient
 }
 
-/*type JsonProcessdataValues []golrackpi.ProcessDataValues
-
-func (pdv JsonProcessdataValues) MarshalJSON() ([]byte, error) {
-	type localPdv JsonProcessdataValues
-	valueJson, err := json.Marshal(localPdv(pdv))
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("in MarshalJSON")
-	//cnt := "foobar" + strconv.Itoa(int(c.Found))
-	//fmt.Println(cnt)
-	//fmt.Println(strconv.Itoa(int(c.Found)))
-	return json.Marshal(map[string]interface{}{
-		"moduleid": map[string]interface{}{
-			"foo": json.RawMessage(valueJson),
-			//		cnt:      json.RawMessage(valueJson),
-		},
-	})
-}
-*/
-
 type PdvMap map[string]golrackpi.ProcessDataValue
 
-//func convertPdvMap(pdv []ProcessDataValueJSON) PdvMap {
 func convertPdvMap(pdv []golrackpi.ProcessDataValue) PdvMap {
 	pdvmap := make(PdvMap)
 
 	for i := range pdv {
-		fmt.Println(pdv[i].Id)
+		//fmt.Println(pdv[i].Id)
 		pdvmap[pdv[i].Id] = pdv[i]
 	}
 	return pdvmap
@@ -62,21 +39,22 @@ func convertPdvMap(pdv []golrackpi.ProcessDataValue) PdvMap {
 func convertPdvsMap(pdvs []golrackpi.ProcessDataValues) map[string]PdvMap {
 	pdvsmap := make(map[string]PdvMap)
 	for i := range pdvs {
-		fmt.Println(pdvs[i].ModuleId)
+		//fmt.Println(pdvs[i].ModuleId)
 		pdvsmap[pdvs[i].ModuleId] = convertPdvMap(pdvs[i].ProcessData)
 	}
 	return pdvsmap
 }
 
-func convertStuff(pd []golrackpi.ProcessDataValues) {
+func convertProcessDataValues(pd []golrackpi.ProcessDataValues) error {
 
-	//jpd := JsonProcessdataValues(pd)
 	pdvsmap := convertPdvsMap(pd)
-	foo, _ := json.Marshal(pdvsmap)
-	// todo: error handling
-	fmt.Println(string(foo))
-	repository.AddData(string(foo))
-	//panic("die hard")
+	pdvsJSON, err := json.Marshal(pdvsmap)
+	if err != nil {
+		return err
+	}
+
+	repository.AddData(string(pdvsJSON))
+	return nil
 }
 
 func (cd *CollectDaemon) genNewId(id int) int {
@@ -87,7 +65,7 @@ func (cd *CollectDaemon) genNewId(id int) int {
 func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 	log.Println("in innerLoop mit i ", i)
 
-	timer2 := time.NewTimer(30 * time.Second)
+	timer2 := time.NewTimer(10 * time.Minute)
 	ticker := time.NewTicker(3 * time.Second)
 
 	for active := true; active; {
@@ -100,8 +78,8 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 				fmt.Println(err)
 				panic("hard error")
 			}
-			fmt.Println(pd)
-			convertStuff(pd)
+			//fmt.Println(pd)
+			convertProcessDataValues(pd)
 
 		case <-timer2.C:
 			log.Println("timer2 fired")
@@ -215,9 +193,7 @@ func GetDbConfig() dbconn.DatabaseConfiguration {
 	return config
 }
 
-type ProcessDataValueJSON golrackpi.ProcessDataValue
-
-//type PdvMap map[string]ProcessDataValueJSON
+/*type ProcessDataValueJSON golrackpi.ProcessDataValue
 
 func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
 	type localPdv ProcessDataValueJSON
@@ -237,7 +213,7 @@ func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
 		//		cnt:      json.RawMessage(valueJson),
 	},
 	)
-}
+}*/
 
 func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
 
