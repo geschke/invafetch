@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 
@@ -33,22 +34,24 @@ var startCmd = &cobra.Command{
 }
 
 func readProcessdataConfig() ([]golrackpi.ProcessData, error) {
-	filename := "processdata.json"
-	// todo: get filename from config variable, error handling and more
-	f, err := os.ReadFile(filename)
-	if err != nil {
-		panic("file problem")
-		// todo: error handling
-	}
-	fmt.Println(json.Valid(f))
+	filename := "processdata.json" // filename is currently fix, the processdata definition comes with invafetch package and contains nearly all processdata parameters
 
 	var processData []golrackpi.ProcessData
+
+	f, err := os.ReadFile(filename)
+	if err != nil {
+		return processData, err
+	}
+	if !json.Valid(f) {
+		return processData, errors.New("file content has invalid JSON structure")
+	}
+
 	err = json.Unmarshal(f, &processData)
 	if err != nil {
-		panic("json file error") // todo....
+		return processData, err
 
 	}
-	fmt.Println(processData)
+
 	return processData, nil
 }
 
@@ -56,7 +59,8 @@ func startCollect() {
 
 	collectData, err := readProcessdataConfig()
 	if err != nil {
-		panic("problem!!!")
+		fmt.Fprintln(os.Stderr, "An error occurred when reading processdata.json definition:", err)
+		os.Exit(1)
 	}
 
 	authData := golrackpi.AuthClient{
@@ -65,6 +69,6 @@ func startCollect() {
 		Password: authData.Password,
 	}
 
-	daemon := pkg.CollectDaemon{AuthData: authData}
+	daemon := pkg.CollectDaemon{AuthData: authData, DbConfig: dbConfig}
 	daemon.Start(collectData)
 }

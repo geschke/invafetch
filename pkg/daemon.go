@@ -13,7 +13,6 @@ import (
 	"github.com/geschke/golrackpi"
 	"github.com/geschke/invafetch/pkg/dbconn"
 	"github.com/geschke/invafetch/pkg/invdb"
-	"github.com/spf13/viper"
 )
 
 var repository *invdb.Repository
@@ -21,6 +20,7 @@ var collectProcessData []golrackpi.ProcessData
 
 type CollectDaemon struct {
 	AuthData golrackpi.AuthClient
+	DbConfig dbconn.DatabaseConfiguration
 	lib      *golrackpi.AuthClient
 }
 
@@ -65,14 +65,14 @@ func (cd *CollectDaemon) genNewId(id int) int {
 func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 	log.Println("in innerLoop mit i ", i)
 
-	timer2 := time.NewTimer(10 * time.Minute)
+	timer2 := time.NewTimer(10 * time.Minute) // todo: make this configurable
 	ticker := time.NewTicker(3 * time.Second)
 
 	for active := true; active; {
 		select {
 		case t := <-ticker.C:
 			fmt.Println("Tick at", t)
-			//pd, err := cd.lib.ProcessDataModule("devices:local")
+
 			pd, err := cd.lib.ProcessDataValues(collectProcessData)
 			if err != nil {
 				fmt.Println(err)
@@ -177,77 +177,21 @@ func (cd *CollectDaemon) logoutLogin() error {
 	return nil
 }
 
-func GetDbConfig() dbconn.DatabaseConfiguration {
-	// could something go wrong here?
-	fmt.Println(viper.Get("dbName"))
-	fmt.Println(viper.Get("dbHost"))
-	fmt.Println(viper.Get("dbUser"))
-	fmt.Println(viper.Get("dbPassword"))
-	fmt.Println(viper.Get("dbPort"))
-	var config dbconn.DatabaseConfiguration
-	config.DBHost = viper.GetString("dbHost")
-	config.DBName = viper.GetString("dbName")
-	config.DBPassword = viper.GetString("dbPassword")
-	config.DBUser = viper.GetString("dbUser")
-	config.DBPort = viper.GetString("dbPort")
-	return config
-}
-
-/*type ProcessDataValueJSON golrackpi.ProcessDataValue
-
-func (pdv ProcessDataValueJSON) MarshalJSON() ([]byte, error) {
-	type localPdv ProcessDataValueJSON
-
-	valueJson, err := json.Marshal(localPdv(pdv))
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Println("in MarshalJSON")
-	messageid := pdv.Id
-	//cnt := "foobar" + strconv.Itoa(int(c.Found))
-	//fmt.Println(cnt)
-	//fmt.Println(strconv.Itoa(int(c.Found)))
-	return json.Marshal(map[string]interface{}{
-		messageid: json.RawMessage(valueJson),
-		//		cnt:      json.RawMessage(valueJson),
-	},
-	)
-}*/
-
 func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
 
-	config := dbconn.ConnectDB(GetDbConfig())
+	db := dbconn.ConnectDB(cd.DbConfig)
 
-	repository = invdb.NewRepository(config)
+	repository = invdb.NewRepository(db)
 
 	collectProcessData = configProcessData
 
-	fmt.Println(cd.lib.SessionId)
-
-	sessionId, err := cd.lib.Login()
+	_, err := cd.lib.Login()
 	if err != nil {
 		fmt.Println("An error occurred:", err)
 		return
 	}
-	fmt.Println("SessionId", sessionId)
-
-	/*	err = cd.logoutLogin()
-		if err != nil {
-			fmt.Println("Error when connecting again", err)
-			return
-		}
-
-		ok, err := cd.lib.Logout()
-		if err != nil {
-			fmt.Println("logout error", err)
-			return
-		}
-		fmt.Println("logout ok?", ok)
-
-		return*/
 
 	cd.PrintMemUsage()
 	ctx, cancel := context.WithCancel(context.Background())
