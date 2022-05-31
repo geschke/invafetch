@@ -2,8 +2,7 @@ package dbconn
 
 import (
 	"database/sql"
-	"fmt"
-	"os"
+	"errors"
 )
 
 // DatabaseConfiguration holds connection parameters for a database
@@ -16,7 +15,7 @@ type DatabaseConfiguration struct {
 }
 
 // ConnectDB returns a database connection
-func ConnectDB(dbConfig DatabaseConfiguration) (db *sql.DB) {
+func ConnectDB(dbConfig DatabaseConfiguration) (*sql.DB, error) {
 	var dsn string
 	dbname := dbConfig.DBName
 	dbhost := dbConfig.DBHost
@@ -31,15 +30,24 @@ func ConnectDB(dbConfig DatabaseConfiguration) (db *sql.DB) {
 		dsn = dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
 
 	} else {
-		fmt.Println("No database connect parameter found, exiting. Please use parameter or environment variables to define database connection.")
-		os.Exit(1)
+		return nil, errors.New("no database connect parameter found, exiting. Please use parameter or environment variables to define database connection")
+
 	}
 
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		fmt.Println("Error by connecting database.")
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return db, errors.New("Error by connecting database:" + err.Error())
+
 	}
-	return db
+	return db, nil
+}
+
+// CloseDB closes the database
+func CloseDB(db *sql.DB) error {
+
+	err := db.Close()
+	if err != nil {
+		return errors.New("Error by closing database: " + err.Error())
+	}
+	return nil
 }

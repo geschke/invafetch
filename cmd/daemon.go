@@ -33,8 +33,10 @@ var startCmd = &cobra.Command{
 	},
 }
 
+// readProcessdataConfig loads the processdata definition from the file "processdata.json". This structure is used when requesting processdata
+// from the inverter, so the requested data will be stored into the database.
 func readProcessdataConfig() ([]golrackpi.ProcessData, error) {
-	filename := "processdata.json" // filename is currently fix, the processdata definition comes with invafetch package and contains nearly all processdata parameters
+	filename := "processdata.json" // filename is currently fixed, the processdata definition comes with invafetch package and contains nearly all processdata parameters
 
 	var processData []golrackpi.ProcessData
 
@@ -49,12 +51,12 @@ func readProcessdataConfig() ([]golrackpi.ProcessData, error) {
 	err = json.Unmarshal(f, &processData)
 	if err != nil {
 		return processData, err
-
 	}
 
 	return processData, nil
 }
 
+// startCollect starts the goroutines which are requesting processdata from the inverter
 func startCollect() {
 
 	collectData, err := readProcessdataConfig()

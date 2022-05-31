@@ -122,6 +122,17 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 					fmt.Println(err)
 					panic("hard error 2") // todo error handling
 				}
+				err = cd.closeDbRepository()
+				if err != nil {
+					fmt.Println(err)
+					panic("hard error 3")
+				}
+				err = cd.openDbRepository()
+				if err != nil {
+					fmt.Println(err)
+					panic("hard error 4")
+				}
+
 				id = cd.innerLoop(ctx, id)
 				log.Println("after innerLoop id", id, time.Now())
 				id = cd.genNewId(id)
@@ -177,17 +188,49 @@ func (cd *CollectDaemon) logoutLogin() error {
 	return nil
 }
 
+func (cd *CollectDaemon) openDbRepository() error {
+	db, err := dbconn.ConnectDB(cd.DbConfig)
+	if err != nil {
+		return err
+	}
+
+	repository = invdb.NewRepository(db)
+	return nil
+}
+
+func (cd *CollectDaemon) closeDbRepository() error {
+	err := repository.Close()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
 
-	db := dbconn.ConnectDB(cd.DbConfig)
+	err := cd.openDbRepository()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return
+	}
+	fmt.Println("Try to close database connection...")
+	err = cd.closeDbRepository()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return
+	}
 
-	repository = invdb.NewRepository(db)
+	err = cd.openDbRepository()
+	if err != nil {
+		fmt.Println("An error occurred:", err)
+		return
+	}
 
 	collectProcessData = configProcessData
 
-	_, err := cd.lib.Login()
+	_, err = cd.lib.Login()
 	if err != nil {
 		fmt.Println("An error occurred:", err)
 		return

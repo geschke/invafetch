@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/geschke/invafetch/pkg/dbconn"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -190,6 +191,14 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{
 		db: db,
 	}
+}
+
+func (r *Repository) Close() error {
+	err := dbconn.CloseDB(r.db)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetDevicesLocalBattery loads the values from devices:local:battery section as average of the last 1 minute
