@@ -341,26 +341,17 @@ func (r *Repository) GetStatisticEnergyFlowLast() (StatisticEnergyFlowLast, erro
 // AddData adds dataset with JSON payload to solardata table
 func (r *Repository) AddData(payload string) (int64, error) {
 
-	//log.Println("in addData...")
-
-	//fmt.Println("mit payload:", payload)
-
 	stmt, err := r.db.Prepare("INSERT INTO solardata (processdata) VALUES(?)")
 	if err != nil {
 		fmt.Println(err.Error())
 		return -1, err
-		//os.Exit(1)
 	}
 	defer stmt.Close()
 	res, err := stmt.Exec(payload)
 	if err != nil {
-		//fmt.Println(insertErr.Error())
 		return -1, err
-		//fmt.Println(insertErr.Error())
-		//os.Exit(1)
 	}
 
-	//defer db.Close()
 	return res.LastInsertId()
 }
 
