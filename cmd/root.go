@@ -17,10 +17,12 @@ import (
 
 var (
 	// Used for flags.
-	cfgFile  string
-	dbConfig dbconn.DatabaseConfiguration
-
-	rootCmd = &cobra.Command{
+	cfgFile                    string
+	timeRequestDurationSeconds int64
+	timeNewLoginMinutes        int64
+	dbConfig                   dbconn.DatabaseConfiguration
+	authData                   golrackpi.AuthClient
+	rootCmd                    = &cobra.Command{
 		Use:   "invafetch",
 		Short: "A tool for retrieving values from Kostal Plenticore inverters",
 		//Long: ` `,
@@ -28,11 +30,9 @@ var (
 	}
 )
 
-var authData golrackpi.AuthClient
-
 // init sets the global flags and their options.
 func init() {
-	cobra.OnInitialize(initConfig, initAuthData)
+	cobra.OnInitialize(initConfig, initAuthData, initTimeData)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ~/.env)")
 
 	rootCmd.PersistentFlags().StringVarP(&authData.Password, "password", "p", "", "Password (required)")
@@ -59,8 +59,14 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&dbConfig.DBPassword, "dbpassword", "", "", "Database password")
 	viper.BindPFlag("dbPassword", rootCmd.PersistentFlags().Lookup("dbpassword"))
 
-	rootCmd.PersistentFlags().StringVarP(&dbConfig.DBPort, "dbport", "", "", "Database port (default: 3306)")
+	rootCmd.PersistentFlags().StringVarP(&dbConfig.DBPort, "dbport", "", "3306", "Database port")
 	viper.BindPFlag("dbPort", rootCmd.PersistentFlags().Lookup("dbport"))
+
+	rootCmd.PersistentFlags().Int64VarP(&timeNewLoginMinutes, "time-new-login", "", 10, "Duration in minutes between two logins to inverter and database")
+	viper.BindPFlag("time_new_login_minutes", rootCmd.PersistentFlags().Lookup("time-new-login"))
+
+	rootCmd.PersistentFlags().Int64VarP(&timeRequestDurationSeconds, "time-request", "", 3, "Request new processdata every n seconds")
+	viper.BindPFlag("time_request_duration_seconds", rootCmd.PersistentFlags().Lookup("time-request"))
 
 }
 
@@ -84,6 +90,12 @@ func initAuthData() {
 
 }
 
+func initTimeData() {
+
+	timeNewLoginMinutes = viper.GetInt64("TIME_NEW_LOGIN_MINUTES")
+	timeRequestDurationSeconds = viper.GetInt64("TIME_REQUEST_DURATION_SECONDS")
+}
+
 func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the --config flag.
@@ -102,6 +114,8 @@ func initConfig() {
 
 	viper.SetDefault("dbPort", "3306")
 	viper.SetDefault("inv_scheme", "http")
+	viper.SetDefault("time_request_duration_seconds", 3)
+	viper.SetDefault("time_new_login_minutes", 10)
 
 	viper.BindEnv("DBHOST")
 	viper.BindEnv("DBNAME")
@@ -111,6 +125,8 @@ func initConfig() {
 	viper.BindEnv("INV_SERVER")
 	viper.BindEnv("INV_PASSWORD")
 	viper.BindEnv("INV_SCHEME")
+	viper.BindEnv("TIME_REQUEST_DURATION_SECONDS")
+	viper.BindEnv("TIME_NEW_LOGIN_MINUTES")
 
 	if err := viper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {

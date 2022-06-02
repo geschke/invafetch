@@ -72,5 +72,5 @@ func startCollect() {
 	}
 
 	daemon := pkg.CollectDaemon{AuthData: authData, DbConfig: dbConfig}
-	daemon.Start(collectData)
+	daemon.Start(collectData, timeNewLoginMinutes, timeRequestDurationSeconds)
 }

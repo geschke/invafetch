@@ -30,7 +30,6 @@ func convertPdvMap(pdv []golrackpi.ProcessDataValue) PdvMap {
 	pdvmap := make(PdvMap)
 
 	for i := range pdv {
-		//fmt.Println(pdv[i].Id)
 		pdvmap[pdv[i].Id] = pdv[i]
 	}
 	return pdvmap
@@ -45,41 +44,50 @@ func convertPdvsMap(pdvs []golrackpi.ProcessDataValues) map[string]PdvMap {
 	return pdvsmap
 }
 
-func convertProcessDataValues(pd []golrackpi.ProcessDataValues) error {
+func convertProcessDataValues(pd []golrackpi.ProcessDataValues) ([]byte, error) {
 
+	var pdvsJSON []byte
 	pdvsmap := convertPdvsMap(pd)
 	pdvsJSON, err := json.Marshal(pdvsmap)
 	if err != nil {
-		return err
+		return pdvsJSON, err
 	}
 
-	repository.AddData(string(pdvsJSON))
-	return nil
+	//repository.AddData(string(pdvsJSON))
+	return pdvsJSON, nil
 }
 
-func (cd *CollectDaemon) genNewId(id int) int {
-	id++
-	return id
-}
+func (cd *CollectDaemon) innerLoop(ctx context.Context, newLoginTimeMinutes int64, tickerTimeSeconds int64) {
+	log.Println("in innerLoop")
 
-func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
-	log.Println("in innerLoop mit i ", i)
+	timer2 := time.NewTimer(time.Duration(newLoginTimeMinutes) * time.Minute)
+	ticker := time.NewTicker(time.Duration(tickerTimeSeconds) * time.Second)
 
-	timer2 := time.NewTimer(10 * time.Minute) // todo: make this configurable
-	ticker := time.NewTicker(3 * time.Second)
-
+	// todo: if something failed, repeat 5 or 10 times, then set fail status
 	for active := true; active; {
 		select {
 		case t := <-ticker.C:
 			fmt.Println("Tick at", t)
 
 			pd, err := cd.lib.ProcessDataValues(collectProcessData)
+
 			if err != nil {
 				fmt.Println(err)
 				panic("hard error")
 			}
 			//fmt.Println(pd)
-			convertProcessDataValues(pd)
+			pdvsJSON, err := convertProcessDataValues(pd)
+			//err = errors.New("foo error")
+			if err != nil {
+				// fail silently
+				continue
+			}
+			lastId, err := repository.AddData(string(pdvsJSON))
+			if err != nil {
+				// fail silently
+				continue
+			}
+			fmt.Println("entry", lastId, "added")
 
 		case <-timer2.C:
 			log.Println("timer2 fired")
@@ -98,14 +106,13 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, i int) int {
 	ticker.Stop()
 	log.Print("end innerLoop\n\n")
 
-	return i
 }
 
-func (cd *CollectDaemon) outerLoop(ctx context.Context) {
+func (cd *CollectDaemon) outerLoop(ctx context.Context, newLoginTimeMinutes int64, tickerTime int64) {
 	//timer1 := time.NewTimer(10 * time.Hour)
 
 	log.Println("in outerLoop start")
-	id := 0
+
 	cnt := 0
 	done := make(chan bool)
 	go func() {
@@ -116,8 +123,21 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 				active1 = false
 			default:
 				cd.PrintMemUsage()
-				log.Println("in for mit id ", id, " und cnt:", cnt, " and before innerLoop", time.Now())
-				err := cd.logoutLogin()
+				err := cd.login()
+				if err != nil {
+					fmt.Println(err)
+					panic("hard error 1")
+				}
+				log.Println("in for cnt:", cnt, " and before innerLoop", time.Now())
+				err = cd.openDbRepository()
+				if err != nil {
+					fmt.Println(err)
+					panic("hard error 4")
+				}
+
+				cd.innerLoop(ctx, newLoginTimeMinutes, tickerTime)
+				log.Println("after innerLoop", time.Now())
+				err = cd.logout()
 				if err != nil {
 					fmt.Println(err)
 					panic("hard error 2") // todo error handling
@@ -127,16 +147,7 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 					fmt.Println(err)
 					panic("hard error 3")
 				}
-				err = cd.openDbRepository()
-				if err != nil {
-					fmt.Println(err)
-					panic("hard error 4")
-				}
 
-				id = cd.innerLoop(ctx, id)
-				log.Println("after innerLoop id", id, time.Now())
-				id = cd.genNewId(id)
-				log.Println("after genNewId:", id, " time:", time.Now())
 				cnt++
 			}
 		}
@@ -165,14 +176,17 @@ func (cd *CollectDaemon) outerLoop(ctx context.Context) {
 	return
 }
 
-func (cd *CollectDaemon) logoutLogin() error {
+func (cd *CollectDaemon) logout() error {
 	ok, err := cd.lib.Logout()
 	if err != nil {
 		//fmt.Println("logout error", err)
 		return fmt.Errorf("logout error: %s", err)
 	}
 	fmt.Println("logout ok?", ok)
+	return nil
+}
 
+func (cd *CollectDaemon) login() error {
 	fmt.Println("Try another login...")
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
 
@@ -186,6 +200,7 @@ func (cd *CollectDaemon) logoutLogin() error {
 	fmt.Println("SessionId", sessionId)
 
 	return nil
+
 }
 
 func (cd *CollectDaemon) openDbRepository() error {
@@ -206,35 +221,10 @@ func (cd *CollectDaemon) closeDbRepository() error {
 	return nil
 }
 
-func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
+func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData, newLoginTimeMinutes int64, tickerTimeSeconds int64) {
 
 	cd.lib = golrackpi.NewWithParameter(cd.AuthData)
-
-	err := cd.openDbRepository()
-	if err != nil {
-		fmt.Println("An error occurred:", err)
-		return
-	}
-	fmt.Println("Try to close database connection...")
-	err = cd.closeDbRepository()
-	if err != nil {
-		fmt.Println("An error occurred:", err)
-		return
-	}
-
-	err = cd.openDbRepository()
-	if err != nil {
-		fmt.Println("An error occurred:", err)
-		return
-	}
-
 	collectProcessData = configProcessData
-
-	_, err = cd.lib.Login()
-	if err != nil {
-		fmt.Println("An error occurred:", err)
-		return
-	}
 
 	cd.PrintMemUsage()
 	ctx, cancel := context.WithCancel(context.Background())
@@ -249,14 +239,13 @@ func (cd *CollectDaemon) Start(configProcessData []golrackpi.ProcessData) {
 		signal.Notify(c, os.Interrupt)
 		//signal.Notify(c, os.Kill)
 		<-c
-		log.Println("Abbruch mit Ctrl+C")
+		log.Println("Stopped by Ctrl+C")
 
 		cancel()
 	}()
 
-	cd.outerLoop(ctx)
+	cd.outerLoop(ctx, newLoginTimeMinutes, tickerTimeSeconds)
 
-	//innerLoop(id)
 	log.Println("after outerLoop")
 
 	cd.PrintMemUsage()
