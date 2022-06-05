@@ -26,10 +26,12 @@ func ConnectDB(dbConfig DatabaseConfiguration) (*sql.DB, error) {
 	if len(dbport) < 1 {
 		dbport = "3306"
 	}
+
 	if len(dbname) >= 1 && len(dbhost) >= 1 && len(dbuser) >= 1 && len(dbpassword) >= 1 {
 		dsn = dbuser + ":" + dbpassword + "@tcp(" + dbhost + ":" + dbport + ")/" + dbname
 
 	} else {
+
 		return nil, errors.New("no database connect parameter found, exiting. Please use parameter or environment variables to define database connection")
 
 	}

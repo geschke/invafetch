@@ -188,9 +188,12 @@ type Repository struct {
 
 // NewRepository creates a new database representation
 func NewRepository(db *sql.DB) *Repository {
-	return &Repository{
+	var repository Repository
+	repository.db = db
+	return &repository
+	/*return Repository{
 		db: db,
-	}
+	}*/
 }
 
 func (r *Repository) Close() error {
