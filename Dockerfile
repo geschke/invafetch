@@ -1,7 +1,7 @@
 FROM golang:alpine as builder
 
 LABEL maintainer="Ralf Geschke <ralf@kuerbis.org>"
-LABEL last_changed="2022-05-27"
+LABEL last_changed="2022-06-06"
 
 RUN apk update && apk add --no-cache git
 
@@ -23,4 +23,4 @@ COPY --from=builder /build/invafetch /app/
 #COPY --from=builder /build-cli/dynpower-cli /app/
 ENV PATH "$PATH:/app"
 WORKDIR /app
-CMD ["./invafetch"]
+CMD ["./invafetch","start"]
