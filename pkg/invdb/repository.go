@@ -22,168 +22,168 @@ type ProcessdataEntry struct {
 type DevicesLocal struct {
 	ID          int64
 	DateCreated string
-	Bat2Grid_P  string
-	Dc_P        string
-	DigitalIn   string
-	EM_State    string
-	Grid2Bat_P  string
-	Grid_L1_I   string
-	Grid_L1_P   string
-	Grid_L2_I   string
-	Grid_L2_P   string
-	Grid_L3_I   string
-	Grid_L3_P   string
-	Grid_P      string
-	Grid_Q      string
-	Grid_S      string
-	HomeBat_P   string
-	HomeGrid_P  string
-	HomeOwn_P   string
-	HomePv_P    string
-	Home_P      string
-	Iso_R       string
-	LimitEvuRel string
-	PV2Bat_P    string
+	Bat2Grid_P  sql.NullString // string
+	Dc_P        sql.NullString // string
+	DigitalIn   sql.NullString // string
+	EM_State    sql.NullString // string
+	Grid2Bat_P  sql.NullString // string
+	Grid_L1_I   sql.NullString // string
+	Grid_L1_P   sql.NullString // string
+	Grid_L2_I   sql.NullString // string
+	Grid_L2_P   sql.NullString // string
+	Grid_L3_I   sql.NullString // string
+	Grid_L3_P   sql.NullString // string
+	Grid_P      sql.NullString // string
+	Grid_Q      sql.NullString // string
+	Grid_S      sql.NullString // string
+	HomeBat_P   sql.NullString //string
+	HomeGrid_P  sql.NullString //string
+	HomeOwn_P   sql.NullString //string
+	HomePv_P    sql.NullString //string
+	Home_P      sql.NullString //string
+	Iso_R       sql.NullString // string
+	LimitEvuRel sql.NullString // string
+	PV2Bat_P    sql.NullString // string
 }
 
 type DevicesLocalAc struct {
 	ID            int64
 	DateCreated   string
-	CosPhi        string
-	Frequency     string
-	InvIn_P       string
-	InvOut_P      string
-	L1_I          string
-	L1_P          string
-	L1_U          string
-	L2_I          string
-	L2_P          string
-	L2_U          string
-	L3_I          string
-	L3_P          string
-	L3_U          string
-	P             string
-	Q             string
-	ResidualCDc_I string
-	S             string
+	CosPhi        sql.NullString // string
+	Frequency     sql.NullString // string
+	InvIn_P       sql.NullString // string
+	InvOut_P      sql.NullString // string
+	L1_I          sql.NullString // string
+	L1_P          sql.NullString // string
+	L1_U          sql.NullString // string
+	L2_I          sql.NullString // string
+	L2_P          sql.NullString // string
+	L2_U          sql.NullString // string
+	L3_I          sql.NullString // string
+	L3_P          sql.NullString // string
+	L3_U          sql.NullString // string
+	P             sql.NullString // string
+	Q             sql.NullString // string
+	ResidualCDc_I sql.NullString // string
+	S             sql.NullString // string
 }
 
 type DevicesLocalLast struct {
 	ID            int64
 	DateCreated   string
-	InverterState string
-	SinkMax_P     string
-	SourceMax_P   string
-	WorkTime      string
+	InverterState sql.NullString // string
+	SinkMax_P     sql.NullString // string
+	SourceMax_P   sql.NullString // string
+	WorkTime      sql.NullString // string
 }
 
 type DevicesLocalBatteryLast struct {
 	ID              int64
 	DateCreated     string
-	BatManufacturer string
-	BatModel        string
-	BatSerialNo     string
-	BatVersionFW    string
-	Cycles          string
+	BatManufacturer sql.NullString // string
+	BatModel        sql.NullString // string
+	BatSerialNo     sql.NullString // string
+	BatVersionFW    sql.NullString // string
+	Cycles          sql.NullString // string
 }
 
 type DevicesLocalBattery struct {
 	ID              int64
 	DateCreated     string
-	FullChargeCap_E string
-	I               string
-	P               string
-	SoC             string
-	U               string
-	WorkCapacity    string
+	FullChargeCap_E sql.NullString // string
+	I               sql.NullString // string
+	P               sql.NullString // string
+	SoC             sql.NullString // string
+	U               sql.NullString // string
+	WorkCapacity    sql.NullString // string
 }
 
 type DevicesLocalPowermeter struct {
 	ID          int64
 	DateCreated string
-	CosPhi      string
-	Frequency   string
-	P           string
-	Q           string
-	S           string
+	CosPhi      sql.NullString // string
+	Frequency   sql.NullString // string
+	P           sql.NullString // string
+	Q           sql.NullString // string
+	S           sql.NullString // string
 }
 
 type DevicesLocalPv struct {
 	ID          int64
 	DateCreated string
-	I           string
-	P           string
-	U           string
+	I           sql.NullString // string
+	P           sql.NullString // string
+	U           sql.NullString // string
 }
 
 type StatisticEnergyFlowLast struct {
 	ID                                int64
 	DateCreated                       string
-	StatisticAutarkyDay               string
-	StatisticAutarkyMonth             string
-	StatisticAutarkyTotal             string
-	StatisticAutarkyYear              string
-	StatisticCO2SavingDay             string
-	StatisticCO2SavingMonth           string
-	StatisticCO2SavingTotal           string
-	StatisticCO2SavingYear            string
-	StatisticEnergyChargeGridDay      string
-	StatisticEnergyChargeGridMonth    string
-	StatisticEnergyChargeGridTotal    string
-	StatisticEnergyChargeGridYear     string
-	StatisticEnergyChargeInvInDay     string
-	StatisticEnergyChargeInvInMonth   string
-	StatisticEnergyChargeInvInTotal   string
-	StatisticEnergyChargeInvInYear    string
-	StatisticEnergyChargePvDay        string
-	StatisticEnergyChargePvMonth      string
-	StatisticEnergyChargePvTotal      string
-	StatisticEnergyChargePvYear       string
-	StatisticEnergyDischargeDay       string
-	StatisticEnergyDischargeMonth     string
-	StatisticEnergyDischargeTotal     string
-	StatisticEnergyDischargeYear      string
-	StatisticEnergyDischargeGridDay   string
-	StatisticEnergyDischargeGridMonth string
-	StatisticEnergyDischargeGridTotal string
-	StatisticEnergyDischargeGridYear  string
-	StatisticEnergyHomeDay            string
-	StatisticEnergyHomeMonth          string
-	StatisticEnergyHomeTotal          string
-	StatisticEnergyHomeYear           string
-	StatisticEnergyHomeBatDay         string
-	StatisticEnergyHomeBatMonth       string
-	StatisticEnergyHomeBatTotal       string
-	StatisticEnergyHomeBatYear        string
-	StatisticEnergyHomeGridDay        string
-	StatisticEnergyHomeGridMonth      string
-	StatisticEnergyHomeGridTotal      string
-	StatisticEnergyHomeGridYear       string
-	StatisticEnergyHomeOwnTotal       string
-	StatisticEnergyHomePvDay          string
-	StatisticEnergyHomePvMonth        string
-	StatisticEnergyHomePvTotal        string
-	StatisticEnergyHomePvYear         string
-	StatisticEnergyPv1Day             string
-	StatisticEnergyPv1Month           string
-	StatisticEnergyPv1Total           string
-	StatisticEnergyPv1Year            string
-	StatisticEnergyPv2Day             string
-	StatisticEnergyPv2Month           string
-	StatisticEnergyPv2Total           string
-	StatisticEnergyPv2Year            string
-	StatisticEnergyPv3Day             string
-	StatisticEnergyPv3Month           string
-	StatisticEnergyPv3Total           string
-	StatisticEnergyPv3Year            string
-	StatisticOwnConsumptionRateDay    string
-	StatisticOwnConsumptionRateMonth  string
-	StatisticOwnConsumptionRateTotal  string
-	StatisticOwnConsumptionRateYear   string
-	StatisticYieldDay                 string
-	StatisticYieldMonth               string
-	StatisticYieldTotal               string
-	StatisticYieldYear                string
+	StatisticAutarkyDay               sql.NullString // string
+	StatisticAutarkyMonth             sql.NullString // string
+	StatisticAutarkyTotal             sql.NullString // string
+	StatisticAutarkyYear              sql.NullString // string
+	StatisticCO2SavingDay             sql.NullString // string
+	StatisticCO2SavingMonth           sql.NullString // string
+	StatisticCO2SavingTotal           sql.NullString // string
+	StatisticCO2SavingYear            sql.NullString // string
+	StatisticEnergyChargeGridDay      sql.NullString // string
+	StatisticEnergyChargeGridMonth    sql.NullString // string
+	StatisticEnergyChargeGridTotal    sql.NullString // string
+	StatisticEnergyChargeGridYear     sql.NullString // string
+	StatisticEnergyChargeInvInDay     sql.NullString // string
+	StatisticEnergyChargeInvInMonth   sql.NullString // string
+	StatisticEnergyChargeInvInTotal   sql.NullString // string
+	StatisticEnergyChargeInvInYear    sql.NullString // string
+	StatisticEnergyChargePvDay        sql.NullString // string
+	StatisticEnergyChargePvMonth      sql.NullString // string
+	StatisticEnergyChargePvTotal      sql.NullString // string
+	StatisticEnergyChargePvYear       sql.NullString // string
+	StatisticEnergyDischargeDay       sql.NullString // string
+	StatisticEnergyDischargeMonth     sql.NullString // string
+	StatisticEnergyDischargeTotal     sql.NullString // string
+	StatisticEnergyDischargeYear      sql.NullString // string
+	StatisticEnergyDischargeGridDay   sql.NullString // string
+	StatisticEnergyDischargeGridMonth sql.NullString // string
+	StatisticEnergyDischargeGridTotal sql.NullString // string
+	StatisticEnergyDischargeGridYear  sql.NullString // string
+	StatisticEnergyHomeDay            sql.NullString // string
+	StatisticEnergyHomeMonth          sql.NullString // string
+	StatisticEnergyHomeTotal          sql.NullString // string
+	StatisticEnergyHomeYear           sql.NullString // string
+	StatisticEnergyHomeBatDay         sql.NullString // string
+	StatisticEnergyHomeBatMonth       sql.NullString // string
+	StatisticEnergyHomeBatTotal       sql.NullString // string
+	StatisticEnergyHomeBatYear        sql.NullString // string
+	StatisticEnergyHomeGridDay        sql.NullString // string
+	StatisticEnergyHomeGridMonth      sql.NullString // string
+	StatisticEnergyHomeGridTotal      sql.NullString // string
+	StatisticEnergyHomeGridYear       sql.NullString // string
+	StatisticEnergyHomeOwnTotal       sql.NullString // string
+	StatisticEnergyHomePvDay          sql.NullString // string
+	StatisticEnergyHomePvMonth        sql.NullString // string
+	StatisticEnergyHomePvTotal        sql.NullString // string
+	StatisticEnergyHomePvYear         sql.NullString // string
+	StatisticEnergyPv1Day             sql.NullString // string
+	StatisticEnergyPv1Month           sql.NullString // string
+	StatisticEnergyPv1Total           sql.NullString // string
+	StatisticEnergyPv1Year            sql.NullString // string
+	StatisticEnergyPv2Day             sql.NullString // string
+	StatisticEnergyPv2Month           sql.NullString // string
+	StatisticEnergyPv2Total           sql.NullString // string
+	StatisticEnergyPv2Year            sql.NullString // string
+	StatisticEnergyPv3Day             sql.NullString // string
+	StatisticEnergyPv3Month           sql.NullString // string
+	StatisticEnergyPv3Total           sql.NullString // string
+	StatisticEnergyPv3Year            sql.NullString // string
+	StatisticOwnConsumptionRateDay    sql.NullString // string
+	StatisticOwnConsumptionRateMonth  sql.NullString // string
+	StatisticOwnConsumptionRateTotal  sql.NullString // string
+	StatisticOwnConsumptionRateYear   sql.NullString // string
+	StatisticYieldDay                 sql.NullString // string
+	StatisticYieldMonth               sql.NullString // string
+	StatisticYieldTotal               sql.NullString // string
+	StatisticYieldYear                sql.NullString // string
 }
 
 type Repository struct {
