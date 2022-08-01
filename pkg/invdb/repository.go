@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/geschke/invafetch/pkg/dbconn"
 	_ "github.com/go-sql-driver/mysql"
@@ -206,6 +207,24 @@ func (r *Repository) Close() error {
 		return err
 	}
 	return nil
+}
+
+// ConvertToString converts a value created by reflect to string. It returns an empty string in case of error. So it's possible to use
+// sql.NullString and string type in processdata type definition.
+func (r *Repository) ConvertToString(payload *reflect.Value) string {
+
+	var checkSqlNullString sql.NullString
+	payloadType := payload.Type()
+
+	if payloadType == reflect.TypeOf(checkSqlNullString) { // payload is type sql.NullString
+		if !payload.FieldByName("Valid").Bool() { // invalid, return 0
+			return "0"
+		}
+		return payload.FieldByName("String").String()
+	} else if payload.Kind().String() == "string" { // payload is a string
+		return payload.String()
+	}
+	return "0" // payload is something else, return 0
 }
 
 // GetDevicesLocalBattery loads the values from devices:local:battery section as average of the last 1 minute
