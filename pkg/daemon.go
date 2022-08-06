@@ -88,12 +88,14 @@ func (cd *CollectDaemon) innerLoop(ctx context.Context, newLoginTimeMinutes int6
 			pdvsJSON, err := convertProcessDataValues(pd)
 			//err = errors.New("foo error")
 			if err != nil {
+				log.Println("convert error", err)
 				// fail silently
 				continue
 			}
 			//lastId, err := repository.AddData(string(pdvsJSON))
 			_, err = repository.AddData(string(pdvsJSON))
 			if err != nil {
+				log.Println("insert error", err)
 				// fail silently
 				continue
 			}
