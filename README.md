@@ -18,7 +18,7 @@ $ go build
 $ go install
 ```
 
-This command builds the hello command, producing an executable binary. It then installs that binary as $HOME/go/bin/invafetch (or, under Windows, %USERPROFILE%\go\bin\invafetch.exe).
+This command builds the invafetch command, producing an executable binary. It then installs that binary as $HOME/go/bin/invafetch (or, under Windows, %USERPROFILE%\go\bin\invafetch.exe).
 After that invafetch can simply be started in the command line interface.
 
 
