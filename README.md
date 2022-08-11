@@ -116,6 +116,6 @@ Alloc = 0 MiB   TotalAlloc = 0 MiB      Sys = 8 MiB     NumGC = 0
 
 In the current version some parameters about memory consumption and current state are written, this may be omitted or offered as an option in future versions. After startup, new content should be found in the solardata table. It should be mentioned again that it is recommended to use the Docker image. The author has been running the combination of invafetch and invaps in a Docker environment stably for several months.
 
-## Lizenz
+## License
 
 Invafetch is licensed under the MIT License. You can read the full terms here: [LICENSE](LICENSE).
