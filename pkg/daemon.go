@@ -215,7 +215,7 @@ func (cd *CollectDaemon) login() error {
 
 // openDbRepository opens the database connection
 func (cd *CollectDaemon) openDbRepository() error {
-	db, err := dbconn.ConnectDB(cd.DbConfig)
+	db, err := dbconn.ConnectDB(cd.DbConfig, 10)
 	if err != nil {
 		return err
 	}
