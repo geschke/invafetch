@@ -34,16 +34,16 @@ The following options exist:
 
 |Name of environment variable|CLI flag|Defaults|Example|Hint|
 |--------------------|-------------|------------|--------|-------|
-|DBHOST|--dbhost|(empty)|"MARIADB DATABASE SERVER"|database server|
-|DBUSER|--dbuser|(empty)|"DATABASE USERNAME"|database username|
-|DBNAME|--dbname|(empty)|"DATABASE NAME"|name of database|
-|DBPASSWORD|--dbpassword|(empty)|"DATABASE PASSWORD"|password of database user|
+|DBHOST|--dbhost|(empty)|"db.example.com"|database server|
+|DBUSER|--dbuser|(empty)|"solaruser"|database username|
+|DBNAME|--dbname|(empty)|"solardb"|name of database|
+|DBPASSWORD|--dbpassword|(empty)|"myDBPassword"|password of database user|
 |DBPORT|--dbport|"3306"|"3306"|MariaDB port (optional)|
-|INV_SERVER|--server|(empty)|"INVERTER ADDRESS"|inverter address (FQDN or IP)|
+|INV_SERVER|--server|(empty)|"192.168.0.100"|inverter address (FQDN or IP)|
 |INV_SCHEME|--scheme|"http"|"http"|possible values: http or https|
-|INV_PASSWORD|--password|(empty)|"INVERTER PASSWORD"|plant owner password|
-|TIME_REQUEST_DURATION_SECONDS|--time-request|3|20|time span between two requests in seconds, i.e. values are read every n seconds|
-|TIME_NEW_LOGIN_MINUTES|--time-new-login|10|60|Duration of a session in minutes. A logout and subsequent login occurs after n minutes, so that a new session is created.|
+|INV_PASSWORD|--password|(empty)|"myPlantOwnerPassword"|plant owner password|
+|TIME_REQUEST_DURATION_SECONDS|--time-request|3|5|time span between two requests in seconds, i.e. values are read every n seconds|
+|TIME_NEW_LOGIN_MINUTES|--time-new-login|10|15|Duration of a session in minutes. A logout and subsequent login occurs after n minutes, so that a new session is created.|
 
 ## CLI
 
