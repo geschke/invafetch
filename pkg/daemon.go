@@ -215,7 +215,7 @@ func (cd *CollectDaemon) login() error {
 
 // openDbRepository opens the database connection
 func (cd *CollectDaemon) openDbRepository() error {
-	db, err := dbconn.ConnectDB(cd.DbConfig, 10)
+	db, err := dbconn.ConnectDB(cd.DbConfig, 30) // allow 30 seconds to connect, this should pass the initialization time when using docker image of MariaDB/MySQL
 	if err != nil {
 		return err
 	}
